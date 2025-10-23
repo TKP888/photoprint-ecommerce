@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="bg-gray-900 text-white py-10">
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
-          <h2 className="text-2xl font-extrabold">Printshop</h2>
+          <h2 className="text-2xl font-extrabold">PhotoPrint</h2>
           <p className="mt-2 text-gray-400">Prints That Inspire.</p>
         </div>
 
@@ -37,7 +37,7 @@ export default function Footer() {
 
         <div>
           <h3 className="font-semibold mb-4">Contact</h3>
-          <p className="text-gray-400">antony@printshop.co.uk</p>
+          <p className="text-gray-400">antony@photoprint.co.uk</p>
           <p className="text-gray-400">+44 7500 000 000</p>
           <div className="flex space-x-4 mt-2">
             <a href="#" className="hover:text-blue-400">
@@ -53,7 +53,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="mt-10 border-t border-gray-700 pt-6 text-center text-gray-500 text-sm">
-        &copy; 2025 Printshop. All rights reserved.
+        &copy; 2025 PhotoPrint. All rights reserved.
       </div>
     </footer>
   );

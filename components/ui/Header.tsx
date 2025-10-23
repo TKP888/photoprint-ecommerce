@@ -6,7 +6,7 @@ export default function Header() {
       <div className="container mx-auto px-8 py-8 flex justify-between items-center">
         <Link href="/" className="hover:text-gray-500 ">
           {" "}
-          <h1 className="text-2xl font-bold">Printshop</h1>
+          <h1 className="text-2xl font-bold">PhotoPrint</h1>
         </Link>{" "}
         <nav>
           <ul className="flex gap-12 text-lg font-bold">
