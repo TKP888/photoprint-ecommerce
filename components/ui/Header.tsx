@@ -17,7 +17,7 @@ export default function Header() {
             </li>
             <li>
               <a
-                href="/products"
+                href="/product"
                 className="hover:text-gray-500 hover:underline"
               >
                 Products

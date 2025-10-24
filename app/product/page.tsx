@@ -1,10 +1,10 @@
 import ProductCard from "@/components/ui/ProductCard";
 
-export default function Home() {
+export default function ProductPage() {
   return (
     <main className="py-8">
       <div className="container mx-auto px-4">
-        <h1 className="text-2xl font-bold mb-8">Featured Products</h1>
+        <h1 className="text-2xl font-bold mb-8">All Products</h1>
 
         {/* Grid container - this will control the card width */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -70,6 +70,70 @@ export default function Home() {
             price={99.99}
             imageUrl="/products/8 Japanese Pine Tree.jpg"
             alt="Japanese Pine Tree"
+            description="This is a test product 8"
+          />
+          <ProductCard
+            id="9"
+            name="Kyoto River"
+            price={69.99}
+            imageUrl="/products/9 Kyoto River.jpg"
+            alt="Kyoto River"
+            description="This is a test product 5"
+          />
+          <ProductCard
+            id="10"
+            name="Porsche Carrera"
+            price={79.99}
+            imageUrl="/products/10 Porsche Carrera.jpg"
+            alt="Porsche Carrera"
+            description="This is a test product 6"
+          />
+          <ProductCard
+            id="11"
+            name="Hiroshima Fishing Boat"
+            price={89.99}
+            imageUrl="/products/11 Hiroshima Fishing Boat.jpg"
+            alt="Hiroshima Fishing Boat"
+            description="This is a test product 7"
+          />
+          <ProductCard
+            id="12"
+            name="Kinkaku-ji Golden Pavilion"
+            price={99.99}
+            imageUrl="/products/12 Kinkakuji Temple.jpg"
+            alt="Kinkaku-ji Golden Pavilion"
+            description="This is a test product 8"
+          />
+          <ProductCard
+            id="13"
+            name="Asakusa at Night"
+            price={69.99}
+            imageUrl="/products/13 Asakusa at Night.jpg"
+            alt="Asakusa at Night"
+            description="This is a test product 5"
+          />
+          <ProductCard
+            id="14"
+            name="Chevy Silverado"
+            price={79.99}
+            imageUrl="/products/14 Chevy Silverado.jpg"
+            alt="Chevy Silverado"
+            description="This is a test product 6"
+          />
+          <ProductCard
+            id="15"
+            name="Bullet Train"
+            price={89.99}
+            imageUrl="/products/15 Bullet Train.jpg"
+            alt="Bullet Train"
+            description="This is a test product 7"
+          />
+          <ProductCard
+            id="16"
+            name="Kabukicho at Night"
+            price={99.99}
+            imageUrl="/products/16 Kabukicho at Night.jpg"
+            alt="Kabukicho at Night"
             description="This is a test product 8"
           />
         </div>
