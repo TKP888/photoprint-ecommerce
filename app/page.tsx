@@ -1,5 +1,6 @@
 import ProductCard from "@/components/ui/ProductCard";
 import Carousel from "@/components/home/Carousel";
+import LimitedEditionSection from "@/components/home/LimitedEditionSection";
 import { createClient } from "@/lib/supabase/client";
 
 export default async function Home() {
@@ -21,12 +22,10 @@ export default async function Home() {
       <div>
         <Carousel />
       </div>
-      <div className="container mx-auto py-20 px-4">
+      <div className="container mx-auto py-12 px-4">
         <h1 className="text-2xl font-bold mb-8">Best Sellers</h1>
 
-        {/* Grid container */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Use products from Supabase instead of hard-coded */}
           {products?.slice(0, 4).map((product) => (
             <ProductCard
               key={product.id}
@@ -39,7 +38,28 @@ export default async function Home() {
           ))}
         </div>
       </div>
-      <div className="container mx-auto py-20 px-4">
+
+      {/* Limited Edition Prints Section */}
+      <LimitedEditionSection
+        items={[
+          {
+            id: "limited-1",
+            title: "Steel Motion",
+            subtitle: "AA moment between cities",
+            imageUrl: "/images/limitededition/Limited-1.jpg",
+            href: "/products",
+          },
+          {
+            id: "limited-2",
+            title: "Golden Stillness",
+            subtitle: "Illumination shaped by craft",
+            imageUrl: "/images/limitededition/Limited-2.jpg",
+            href: "/products",
+          },
+        ]}
+      />
+
+      <div className="container mx-auto py-12 px-4">
         <h1 className="text-2xl font-bold mb-8">Featured Products</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
