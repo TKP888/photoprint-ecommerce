@@ -3,19 +3,14 @@ export default function ProductDetailPage({
 }: {
   params: { id: string };
 }) {
-  // params.id will be "fuji", "shibuya", etc.
   const productId = params.id;
-
-  // Later: Fetch product data from Supabase using this ID
 
   return (
     <main className="py-8">
       <div className="container mx-auto px-4">
         <h1>Product: {productId}</h1>
 
-        {/* Product details will go here */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Product image */}
           <div>
             <img
               src={`/products/${productId}.jpg`}
@@ -24,7 +19,6 @@ export default function ProductDetailPage({
             />
           </div>
 
-          {/* Product info */}
           <div>
             <h2 className="text-3xl font-bold mb-4">Product Name</h2>
             <p className="text-xl font-semibold mb-4">£29.99</p>
@@ -33,6 +27,22 @@ export default function ProductDetailPage({
             </button>
             <p className="mt-4">Product description...</p>
           </div>
+        </div>
+      </div>
+      <div className="container mx-auto py-12 px-4">
+        <h1 className="text-2xl font-bold mb-8">More Products</h1>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {products?.slice(4, 12).map((product) => (
+            <ProductCard
+              key={product.id}
+              id={product.id}
+              name={product.name}
+              price={product.price}
+              imageUrl={product.image_url}
+              description={product.description}
+            />
+          ))}
         </div>
       </div>
     </main>

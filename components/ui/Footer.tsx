@@ -23,7 +23,7 @@ export default function Footer() {
               </a>
             </li>
             <li>
-              <a href="/products" className="hover:text-blue-400">
+              <a href="/product" className="hover:text-blue-400">
                 Products
               </a>
             </li>

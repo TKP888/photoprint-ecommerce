@@ -15,7 +15,6 @@ interface LimitedEditionSectionProps {
 export default function LimitedEditionSection({
   items,
 }: LimitedEditionSectionProps) {
-  // Ensure we only display 2 cards
   const displayItems = items.slice(0, 2);
 
   return (

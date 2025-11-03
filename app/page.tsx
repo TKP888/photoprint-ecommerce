@@ -4,16 +4,13 @@ import LimitedEditionSection from "@/components/home/LimitedEditionSection";
 import { createClient } from "@/lib/supabase/client";
 
 export default async function Home() {
-  // Create Supabase client
   const supabase = createClient();
 
-  // Fetch products from Supabase
   const { data: products, error } = await supabase
     .from("products")
     .select("*")
-    .limit(12); // Get first 12 products
+    .limit(12);
 
-  // If there's an error, you can handle it
   if (error) {
     console.error("Error fetching products:", error);
   }
@@ -39,7 +36,6 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* Limited Edition Prints Section */}
       <LimitedEditionSection
         items={[
           {
