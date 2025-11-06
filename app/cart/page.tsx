@@ -27,7 +27,7 @@ export default function CartPage() {
   }
 
   return (
-    <main className="py-8">
+    <main className="py-8 bg-gray-800">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold">Your Cart</h1>
@@ -52,10 +52,12 @@ export default function CartPage() {
                   className="w-24 h-24 object-cover rounded"
                 />
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-2">{item.name}</h3>
+                  <h3 className="font-semibold text-gray-800 text-lg mb-2">
+                    {item.name}
+                  </h3>
                   <p className="text-blue-600 font-bold mb-4">£{item.price}</p>
                   <div className="flex items-center gap-4">
-                    <label className="text-sm text-gray-600">
+                    <label className="text-md text-gray-600">
                       Quantity:
                       <input
                         type="number"
@@ -84,22 +86,29 @@ export default function CartPage() {
 
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
-              <h2 className="text-xl font-bold mb-4">Order Summary</h2>
+              <h2 className="text-xl font-bold text-gray-800 mb-4">
+                Order Summary
+              </h2>
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between">
-                  <span>Items ({items.length})</span>
-                  <span>£{getTotalPrice().toFixed(2)}</span>
+                  <span className="text-gray-800">Items ({items.length})</span>
+                  <span className="text-gray-800">
+                    £{getTotalPrice().toFixed(2)}
+                  </span>
                 </div>
                 <div className="border-t pt-2">
-                  <div className="flex justify-between font-bold text-lg">
-                    <span>Total</span>
+                  <div className="flex justify-between font-bold text-lg text-gray-800">
+                    <span className="text-gray-800">Total</span>
                     <span>£{getTotalPrice().toFixed(2)}</span>
                   </div>
                 </div>
               </div>
-              <button className="w-full bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-semibold">
+              <Link
+                href="/checkout"
+                className="block w-full bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-semibold text-center"
+              >
                 Proceed to Checkout
-              </button>
+              </Link>
             </div>
           </div>
         </div>

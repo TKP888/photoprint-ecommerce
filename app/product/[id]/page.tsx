@@ -43,7 +43,7 @@ export default async function ProductDetailPage({
     : [];
 
   return (
-    <main className="py-8">
+    <main className="py-8 bg-gray-800">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
@@ -56,11 +56,11 @@ export default async function ProductDetailPage({
 
           <div>
             <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
-            <p className="text-2xl font-semibold mb-4 text-blue-600">
+            <p className="text-xl font-semibold mb-4 text-blue-600">
               £{product.price}
             </p>
             {product.description && (
-              <p className="text-gray-700 mb-6 leading-relaxed">
+              <p className="text-white text-xl mb-6 leading-relaxed">
                 {product.description}
               </p>
             )}

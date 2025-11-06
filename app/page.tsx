@@ -6,6 +6,10 @@ import { createClient } from "@/lib/supabase/client";
 export default async function Home() {
   const supabase = createClient();
 
+  // Fetch all products to find limited edition items
+  const { data: allProducts } = await supabase.from("products").select("*");
+
+  // Fetch limited products for display sections
   const { data: products, error } = await supabase
     .from("products")
     .select("*")
@@ -14,8 +18,17 @@ export default async function Home() {
   if (error) {
     console.error("Error fetching products:", error);
   }
+
+  // Find the limited edition products by name (search in all products)
+  const steelMotion = allProducts?.find(
+    (product) => product.name === "Steel Motion"
+  );
+  const goldenStillness = allProducts?.find(
+    (product) => product.name === "Golden Stillness"
+  );
+
   return (
-    <main className="py-0 ">
+    <main className="py-0 bg-gray-800">
       <div>
         <Carousel />
       </div>
@@ -39,18 +52,20 @@ export default async function Home() {
       <LimitedEditionSection
         items={[
           {
-            id: "limited-1",
+            id: steelMotion?.id || "limited-1",
             title: "Steel Motion",
-            subtitle: "AA moment between cities",
+            subtitle: "A moment between cities",
             imageUrl: "/images/limitededition/Limited-1.jpg",
-            href: "/products",
+            href: steelMotion ? `/product/${steelMotion.id}` : "/products",
           },
           {
-            id: "limited-2",
+            id: goldenStillness?.id || "limited-2",
             title: "Golden Stillness",
             subtitle: "Illumination shaped by craft",
             imageUrl: "/images/limitededition/Limited-2.jpg",
-            href: "/products",
+            href: goldenStillness
+              ? `/product/${goldenStillness.id}`
+              : "/products",
           },
         ]}
       />

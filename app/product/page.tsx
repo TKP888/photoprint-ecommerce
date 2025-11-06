@@ -12,7 +12,7 @@ export default async function ProductPage() {
   }
 
   return (
-    <main className="py-8">
+    <main className="py-8 bg-gray-800">
       <div className="container mx-auto px-4">
         <h1 className="text-2xl font-bold mb-8">All Products</h1>
 
