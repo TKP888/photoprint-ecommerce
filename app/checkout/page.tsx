@@ -1,7 +1,7 @@
 "use client";
 
 import { useCart } from "@/components/cart/CartContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -41,10 +41,45 @@ export default function CheckoutPage() {
   });
 
   // Redirect if cart is empty
+  useEffect(() => {
+    if (items.length === 0) {
+      router.replace("/cart"); // replace avoids back-button issues
+    }
+  }, [items, router]);
+
   if (items.length === 0) {
-    router.push("/cart");
-    return null;
+    return null; // or a spinner
   }
+
+  const isExpiryDateValid = (expiryDate: string) => {
+    const [monthStr, yearStr] = expiryDate.split("/");
+    const expMonth = parseInt(monthStr, 10);
+    const expYear = parseInt(yearStr, 10);
+
+    if (
+      Number.isNaN(expMonth) ||
+      Number.isNaN(expYear) ||
+      expMonth < 1 ||
+      expMonth > 12 ||
+      yearStr.length !== 2
+    ) {
+      return false;
+    }
+
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentYear = currentDate.getFullYear() % 100;
+
+    if (expYear < currentYear) {
+      return false;
+    }
+
+    if (expYear === currentYear && expMonth < currentMonth) {
+      return false;
+    }
+
+    return true;
+  };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -92,6 +127,8 @@ export default function CheckoutPage() {
       newErrors.expiryDate = "Expiry date is required";
     else if (!/^\d{2}\/\d{2}$/.test(paymentInfo.expiryDate))
       newErrors.expiryDate = "Invalid format (MM/YY)";
+    else if (!isExpiryDateValid(paymentInfo.expiryDate))
+      newErrors.expiryDate = "Card has expired";
     if (!paymentInfo.cvv.trim()) newErrors.cvv = "CVV is required";
     else if (!/^\d{3,4}$/.test(paymentInfo.cvv)) newErrors.cvv = "Invalid CVV";
     if (!paymentInfo.cardName.trim())

@@ -1,19 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/components/cart/CartContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface OrderData {
-  orderId: string;
-  items: Array<{
-    id: string;
-    name: string;
-    price: number;
-    quantity: number;
-  }>;
-  shippingInfo: {
+  id: string;
+  order_number: string;
+  created_at: string;
+  shipping_cost: number;
+  subtotal: number;
+  shipping_info: {
     firstName: string;
     lastName: string;
     email: string;
@@ -22,8 +20,13 @@ interface OrderData {
     postcode: string;
     country: string;
   };
+  order_items: Array<{
+    product_id: string;
+    name: string;
+    price: number;
+    quantity: number;
+  }>;
   total: number;
-  orderDate: string;
 }
 
 export default function CheckoutSuccessPage() {
@@ -31,23 +34,39 @@ export default function CheckoutSuccessPage() {
   const { clearCart } = useCart();
   const [orderData, setOrderData] = useState<OrderData | null>(null);
 
+  const searchParams = useSearchParams();
+  const orderNumber = searchParams.get("orderNumber");
+  const clearedRef = useRef(false);
+
   useEffect(() => {
-    // Get order data from sessionStorage
-    const storedOrder = sessionStorage.getItem("lastOrder");
-    if (storedOrder) {
-      const order = JSON.parse(storedOrder);
-      setOrderData(order);
-      // Clear cart after successful order
-      clearCart();
-      // Clear sessionStorage after a delay
-      setTimeout(() => {
-        sessionStorage.removeItem("lastOrder");
-      }, 30000); // Clear after 30 seconds
-    } else {
-      // If no order data, redirect to home
-      router.push("/");
+    if (!orderNumber) {
+      router.replace("/");
+      return;
     }
-  }, [clearCart, router]);
+
+    const fetchOrder = async () => {
+      try {
+        const response = await fetch(`/api/orders/${orderNumber}`);
+        if (!response.ok) {
+          router.replace("/");
+          return;
+        }
+
+        const order = await response.json();
+        setOrderData(order);
+
+        if (!clearedRef.current) {
+          clearCart();
+          clearedRef.current = true;
+        }
+      } catch (error) {
+        console.error("Failed to load order:", error);
+        router.replace("/");
+      }
+    };
+
+    fetchOrder();
+  }, [orderNumber, clearCart, router]);
 
   if (!orderData) {
     return (
@@ -55,7 +74,7 @@ export default function CheckoutSuccessPage() {
         <div className="container mx-auto px-4">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
-            <p className="text-white mt-4">Loading order details...</p>
+            <p className="text-white mt-4">Fetching your order...</p>
           </div>
         </div>
       </main>
@@ -98,12 +117,13 @@ export default function CheckoutSuccessPage() {
                 Order Details
               </h2>
               <p className="text-gray-600">
-                Order ID: <span className="font-semibold">{orderData.orderId}</span>
+                Order ID:{" "}
+                <span className="font-semibold">{orderData.order_number}</span>
               </p>
               <p className="text-gray-600">
                 Order Date:{" "}
                 <span className="font-semibold">
-                  {new Date(orderData.orderDate).toLocaleDateString("en-GB", {
+                  {new Date(orderData.created_at).toLocaleDateString("en-GB", {
                     day: "numeric",
                     month: "long",
                     year: "numeric",
@@ -120,9 +140,9 @@ export default function CheckoutSuccessPage() {
                 Items Ordered
               </h3>
               <div className="space-y-3">
-                {orderData.items.map((item) => (
+                {orderData.order_items.map((item) => (
                   <div
-                    key={item.id}
+                    key={item.product_id}
                     className="flex justify-between items-center py-2 border-b border-gray-200 last:border-0"
                   >
                     <div>
@@ -146,22 +166,32 @@ export default function CheckoutSuccessPage() {
               </h3>
               <div className="text-gray-600">
                 <p>
-                  {orderData.shippingInfo.firstName}{" "}
-                  {orderData.shippingInfo.lastName}
+                  {orderData.shipping_info.firstName}{" "}
+                  {orderData.shipping_info.lastName}
                 </p>
-                <p>{orderData.shippingInfo.address}</p>
+                <p>{orderData.shipping_info.address}</p>
                 <p>
-                  {orderData.shippingInfo.city},{" "}
-                  {orderData.shippingInfo.postcode}
+                  {orderData.shipping_info.city},{" "}
+                  {orderData.shipping_info.postcode}
                 </p>
-                <p>{orderData.shippingInfo.country}</p>
+                <p>{orderData.shipping_info.country}</p>
               </div>
             </div>
 
             {/* Total */}
-            <div className="border-t pt-4">
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold text-gray-800">Total</span>
+            <div className="border-t pt-4 space-y-2">
+              <div className="flex justify-between text-gray-600">
+                <span>Subtotal</span>
+                <span>£{orderData.subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-gray-600">
+                <span>Shipping</span>
+                <span>£{orderData.shipping_cost.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between items-center border-t pt-3">
+                <span className="text-lg font-semibold text-gray-800">
+                  Total
+                </span>
                 <span className="text-2xl font-bold text-blue-600">
                   £{orderData.total.toFixed(2)}
                 </span>
@@ -172,18 +202,18 @@ export default function CheckoutSuccessPage() {
           {/* Next Steps */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
             <h3 className="text-lg font-semibold text-blue-800 mb-2">
-              What's Next?
+              What&apos;s Next?
             </h3>
             <ul className="text-blue-700 space-y-2">
               <li>
                 • You will receive an email confirmation at{" "}
                 <span className="font-semibold">
-                  {orderData.shippingInfo.email}
+                  {orderData.shipping_info.email}
                 </span>
               </li>
               <li>
-                • We'll process your order and send you tracking information
-                once it ships
+                • We&apos;ll process your order and send you tracking
+                information once it ships
               </li>
               <li>• Expected delivery: 5-7 business days</li>
             </ul>
@@ -222,4 +252,3 @@ export default function CheckoutSuccessPage() {
     </main>
   );
 }
-
