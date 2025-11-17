@@ -1,15 +1,59 @@
 "use client";
 
 import { useCart } from "@/components/cart/CartContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "@/components/auth/AuthContext";
+import { createClient } from "@/lib/supabase/client";
+
+interface SavedAddress {
+  id: string;
+  label: string | null;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string | null;
+  address_line1: string;
+  address_line2: string | null;
+  city: string;
+  postcode: string;
+  country: string;
+  is_default: boolean;
+  is_shipping: boolean;
+  is_billing: boolean;
+}
+
+interface SavedPaymentMethod {
+  id: string;
+  brand: string;
+  last4: string;
+  exp_month: number;
+  exp_year: number;
+  is_default: boolean;
+}
 
 export default function CheckoutPage() {
   const { items, getTotalPrice } = useCart();
+  const { user } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Saved addresses and payment methods
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
+  const [savedPaymentMethods, setSavedPaymentMethods] = useState<
+    SavedPaymentMethod[]
+  >([]);
+  const [selectedShippingAddressId, setSelectedShippingAddressId] =
+    useState<string>("");
+  const [selectedBillingAddressId, setSelectedBillingAddressId] =
+    useState<string>("");
+  const [selectedPaymentMethodId, setSelectedPaymentMethodId] =
+    useState<string>("");
+  const [saveShippingAddress, setSaveShippingAddress] = useState(false);
+  const [saveBillingAddress, setSaveBillingAddress] = useState(false);
+  const [savePaymentMethod, setSavePaymentMethod] = useState(false);
 
   // Form state
   const [shippingInfo, setShippingInfo] = useState({
@@ -47,9 +91,185 @@ export default function CheckoutPage() {
     }
   }, [items, router]);
 
+  // Helper functions to fill forms from saved data
+  const fillShippingForm = useCallback((address: SavedAddress) => {
+    setShippingInfo({
+      firstName: address.first_name,
+      lastName: address.last_name,
+      email: address.email,
+      phone: address.phone || "",
+      address:
+        address.address_line1 +
+        (address.address_line2 ? `, ${address.address_line2}` : ""),
+      city: address.city,
+      postcode: address.postcode,
+      country: address.country,
+    });
+  }, []);
+
+  const fillBillingForm = useCallback((address: SavedAddress) => {
+    setBillingInfo((prev) => ({
+      ...prev,
+      firstName: address.first_name,
+      lastName: address.last_name,
+      address:
+        address.address_line1 +
+        (address.address_line2 ? `, ${address.address_line2}` : ""),
+      city: address.city,
+      postcode: address.postcode,
+      country: address.country,
+    }));
+  }, []);
+
+  const fillPaymentForm = useCallback((paymentMethod: SavedPaymentMethod) => {
+    // We can't fill the full card number, but we can show the last 4
+    // For security, we'll just pre-fill the expiry date
+    const formattedExpiry = `${String(paymentMethod.exp_month).padStart(
+      2,
+      "0"
+    )}/${String(paymentMethod.exp_year).slice(-2)}`;
+    setPaymentInfo((prev) => ({
+      ...prev,
+      expiryDate: formattedExpiry,
+      cardNumber: `**** **** **** ${paymentMethod.last4}`,
+    }));
+  }, []);
+
+  // Fetch saved addresses and payment methods if user is logged in
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchSavedData = async () => {
+      const supabase = createClient();
+
+      // Fetch addresses
+      const { data: addresses } = await supabase
+        .from("addresses")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("is_default", { ascending: false });
+
+      if (addresses) {
+        setSavedAddresses(addresses);
+        // Auto-select default shipping address if available
+        const defaultShipping = addresses.find(
+          (addr) => addr.is_default && addr.is_shipping
+        );
+        if (defaultShipping) {
+          setSelectedShippingAddressId(defaultShipping.id);
+        }
+      }
+
+      // Fetch payment methods
+      const { data: paymentMethods } = await supabase
+        .from("payment_methods")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("is_default", { ascending: false });
+
+      if (paymentMethods) {
+        setSavedPaymentMethods(paymentMethods);
+        // Auto-select default payment method if available
+        const defaultPayment = paymentMethods.find((pm) => pm.is_default);
+        if (defaultPayment) {
+          setSelectedPaymentMethodId(defaultPayment.id);
+        }
+      }
+    };
+
+    fetchSavedData();
+  }, [user]);
+
+  // Auto-fill forms when saved data is selected
+  useEffect(() => {
+    if (selectedShippingAddressId) {
+      const address = savedAddresses.find(
+        (addr) => addr.id === selectedShippingAddressId
+      );
+      if (address) {
+        fillShippingForm(address);
+      }
+    }
+  }, [selectedShippingAddressId, savedAddresses, fillShippingForm]);
+
+  useEffect(() => {
+    if (selectedPaymentMethodId) {
+      const paymentMethod = savedPaymentMethods.find(
+        (pm) => pm.id === selectedPaymentMethodId
+      );
+      if (paymentMethod) {
+        fillPaymentForm(paymentMethod);
+      }
+    }
+  }, [selectedPaymentMethodId, savedPaymentMethods, fillPaymentForm]);
+
   if (items.length === 0) {
     return null; // or a spinner
   }
+
+  // Handle address selection
+  const handleShippingAddressSelect = (addressId: string) => {
+    setSelectedShippingAddressId(addressId);
+    if (addressId === "") {
+      // Clear form
+      setShippingInfo({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        address: "",
+        city: "",
+        postcode: "",
+        country: "United Kingdom",
+      });
+    } else {
+      const address = savedAddresses.find((addr) => addr.id === addressId);
+      if (address) {
+        fillShippingForm(address);
+      }
+    }
+  };
+
+  const handleBillingAddressSelect = (addressId: string) => {
+    setSelectedBillingAddressId(addressId);
+    if (addressId === "") {
+      // Clear form
+      setBillingInfo({
+        ...billingInfo,
+        firstName: "",
+        lastName: "",
+        address: "",
+        city: "",
+        postcode: "",
+        country: "United Kingdom",
+      });
+    } else {
+      const address = savedAddresses.find((addr) => addr.id === addressId);
+      if (address) {
+        fillBillingForm(address);
+      }
+    }
+  };
+
+  const handlePaymentMethodSelect = (paymentMethodId: string) => {
+    setSelectedPaymentMethodId(paymentMethodId);
+    if (paymentMethodId === "") {
+      // Clear form
+      setPaymentInfo({
+        cardNumber: "",
+        expiryDate: "",
+        cvv: "",
+        cardName: "",
+      });
+    } else {
+      const paymentMethod = savedPaymentMethods.find(
+        (pm) => pm.id === paymentMethodId
+      );
+      if (paymentMethod) {
+        fillPaymentForm(paymentMethod);
+      }
+    }
+  };
 
   const isExpiryDateValid = (expiryDate: string) => {
     const [monthStr, yearStr] = expiryDate.split("/");
@@ -117,12 +337,22 @@ export default function CheckoutPage() {
     // Payment validation
     if (!paymentInfo.cardNumber.trim())
       newErrors.cardNumber = "Card number is required";
-    else if (
+    else if (selectedPaymentMethodId) {
+      // If using saved payment method, allow masked format
+      if (
+        !/^\*\*\*\*\s?\*\*\*\*\s?\*\*\*\*\s?\d{4}$/.test(
+          paymentInfo.cardNumber.replace(/\s/g, "")
+        )
+      ) {
+        newErrors.cardNumber = "Invalid card number format";
+      }
+    } else if (
       !/^\d{4}\s?\d{4}\s?\d{4}\s?\d{4}$/.test(
         paymentInfo.cardNumber.replace(/\s/g, "")
       )
-    )
+    ) {
       newErrors.cardNumber = "Invalid card number";
+    }
     if (!paymentInfo.expiryDate.trim())
       newErrors.expiryDate = "Expiry date is required";
     else if (!/^\d{2}\/\d{2}$/.test(paymentInfo.expiryDate))
@@ -173,6 +403,88 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
 
     try {
+      const supabase = createClient();
+
+      // Save addresses if requested and user is logged in
+      if (user) {
+        // Save shipping address
+        if (saveShippingAddress && !selectedShippingAddressId) {
+          const [addressLine1, ...addressLine2Parts] =
+            shippingInfo.address.split(", ");
+          const addressLine2 = addressLine2Parts.join(", ") || null;
+
+          await supabase.from("addresses").insert({
+            user_id: user.id,
+            label: null,
+            first_name: shippingInfo.firstName,
+            last_name: shippingInfo.lastName,
+            email: shippingInfo.email,
+            phone: shippingInfo.phone || null,
+            address_line1: addressLine1,
+            address_line2: addressLine2,
+            city: shippingInfo.city,
+            postcode: shippingInfo.postcode,
+            country: shippingInfo.country,
+            is_shipping: true,
+            is_billing: false,
+            is_default: savedAddresses.length === 0, // First address is default
+          });
+        }
+
+        // Save billing address (if different from shipping)
+        if (
+          saveBillingAddress &&
+          !billingInfo.sameAsShipping &&
+          !selectedBillingAddressId
+        ) {
+          const [addressLine1, ...addressLine2Parts] =
+            billingInfo.address.split(", ");
+          const addressLine2 = addressLine2Parts.join(", ") || null;
+
+          await supabase.from("addresses").insert({
+            user_id: user.id,
+            label: null,
+            first_name: billingInfo.firstName,
+            last_name: billingInfo.lastName,
+            email: shippingInfo.email, // Use shipping email
+            phone: shippingInfo.phone || null,
+            address_line1: addressLine1,
+            address_line2: addressLine2,
+            city: billingInfo.city,
+            postcode: billingInfo.postcode,
+            country: billingInfo.country,
+            is_shipping: false,
+            is_billing: true,
+            is_default: false,
+          });
+        }
+
+        // Save payment method if requested
+        if (savePaymentMethod && !selectedPaymentMethodId) {
+          // Extract last 4 digits and brand from card number
+          const cardNumberDigits = paymentInfo.cardNumber.replace(/\s/g, "");
+          const last4 = cardNumberDigits.slice(-4);
+          const [monthStr, yearStr] = paymentInfo.expiryDate.split("/");
+          const expMonth = parseInt(monthStr, 10);
+          const expYear = 2000 + parseInt(yearStr, 10); // Convert YY to YYYY
+
+          // Try to detect brand from card number (simplified)
+          let brand = "Other";
+          if (cardNumberDigits.startsWith("4")) brand = "Visa";
+          else if (cardNumberDigits.startsWith("5")) brand = "Mastercard";
+          else if (cardNumberDigits.startsWith("3")) brand = "American Express";
+
+          await supabase.from("payment_methods").insert({
+            user_id: user.id,
+            brand,
+            last4,
+            exp_month: expMonth,
+            exp_year: expYear,
+            is_default: savedPaymentMethods.length === 0, // First payment method is default
+          });
+        }
+      }
+
       // Calculate totals
       const subtotal = getTotalPrice();
       const shippingCost = 5.99; // Your shipping cost
@@ -230,6 +542,51 @@ export default function CheckoutPage() {
                 <h2 className="text-2xl font-bold mb-6 text-gray-800">
                   Shipping Information
                 </h2>
+                {user &&
+                  savedAddresses.filter((addr) => addr.is_shipping).length >
+                    0 && (
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Use Saved Address
+                      </label>
+                      <select
+                        value={selectedShippingAddressId}
+                        onChange={(e) =>
+                          handleShippingAddressSelect(e.target.value)
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                      >
+                        <option value="">Enter new address</option>
+                        {savedAddresses
+                          .filter((addr) => addr.is_shipping)
+                          .map((addr) => (
+                            <option key={addr.id} value={addr.id}>
+                              {addr.label ||
+                                `${addr.first_name} ${addr.last_name}`}
+                              {addr.is_default && " (Default)"}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                  )}
+                {user && (
+                  <div className="mb-4">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={saveShippingAddress}
+                        onChange={(e) =>
+                          setSaveShippingAddress(e.target.checked)
+                        }
+                        className="mr-2"
+                        disabled={!!selectedShippingAddressId}
+                      />
+                      <span className="text-sm text-gray-700">
+                        Save this address for future orders
+                      </span>
+                    </label>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -455,6 +812,55 @@ export default function CheckoutPage() {
                   </label>
                 </div>
                 {!billingInfo.sameAsShipping && (
+                  <>
+                    {user &&
+                      savedAddresses.filter((addr) => addr.is_billing).length >
+                        0 && (
+                        <div className="mb-4">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Use Saved Billing Address
+                          </label>
+                          <select
+                            value={selectedBillingAddressId}
+                            onChange={(e) =>
+                              handleBillingAddressSelect(e.target.value)
+                            }
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                          >
+                            <option value="">Enter new address</option>
+                            {savedAddresses
+                              .filter((addr) => addr.is_billing)
+                              .map((addr) => (
+                                <option key={addr.id} value={addr.id}>
+                                  {addr.label ||
+                                    `${addr.first_name} ${addr.last_name}`}
+                                  {addr.is_default && " (Default)"}
+                                </option>
+                              ))}
+                          </select>
+                        </div>
+                      )}
+                    {user && (
+                      <div className="mb-4">
+                        <label className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={saveBillingAddress}
+                            onChange={(e) =>
+                              setSaveBillingAddress(e.target.checked)
+                            }
+                            className="mr-2"
+                            disabled={!!selectedBillingAddressId}
+                          />
+                          <span className="text-sm text-gray-700">
+                            Save this billing address for future orders
+                          </span>
+                        </label>
+                      </div>
+                    )}
+                  </>
+                )}
+                {!billingInfo.sameAsShipping && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -612,6 +1018,44 @@ export default function CheckoutPage() {
                 <h2 className="text-2xl font-bold mb-6 text-gray-800">
                   Payment Information
                 </h2>
+                {user && savedPaymentMethods.length > 0 && (
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Use Saved Payment Method
+                    </label>
+                    <select
+                      value={selectedPaymentMethodId}
+                      onChange={(e) =>
+                        handlePaymentMethodSelect(e.target.value)
+                      }
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                    >
+                      <option value="">Enter new payment method</option>
+                      {savedPaymentMethods.map((pm) => (
+                        <option key={pm.id} value={pm.id}>
+                          {pm.brand} ending in {pm.last4}
+                          {pm.is_default && " (Default)"}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                {user && (
+                  <div className="mb-4">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={savePaymentMethod}
+                        onChange={(e) => setSavePaymentMethod(e.target.checked)}
+                        className="mr-2"
+                        disabled={!!selectedPaymentMethodId}
+                      />
+                      <span className="text-sm text-gray-700">
+                        Save this payment method for future orders
+                      </span>
+                    </label>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -628,8 +1072,13 @@ export default function CheckoutPage() {
                         })
                       }
                       maxLength={19}
+                      readOnly={!!selectedPaymentMethodId}
                       className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 ${
                         errors.cardNumber ? "border-red-500" : "border-gray-300"
+                      } ${
+                        selectedPaymentMethodId
+                          ? "bg-gray-100 cursor-not-allowed"
+                          : ""
                       }`}
                     />
                     {errors.cardNumber && (
@@ -653,8 +1102,13 @@ export default function CheckoutPage() {
                         })
                       }
                       maxLength={5}
+                      readOnly={!!selectedPaymentMethodId}
                       className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 ${
                         errors.expiryDate ? "border-red-500" : "border-gray-300"
+                      } ${
+                        selectedPaymentMethodId
+                          ? "bg-gray-100 cursor-not-allowed"
+                          : ""
                       }`}
                     />
                     {errors.expiryDate && (
