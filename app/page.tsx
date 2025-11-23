@@ -44,6 +44,8 @@ export default async function Home() {
               price={product.price}
               imageUrl={product.image_url}
               description={product.description}
+              stock={(product as any).stock}
+              stockQuantity={(product as any).stock_quantity}
             />
           ))}
         </div>
@@ -82,6 +84,8 @@ export default async function Home() {
               price={product.price}
               imageUrl={product.image_url}
               description={product.description}
+              stock={(product as any).stock}
+              stockQuantity={(product as any).stock_quantity}
             />
           ))}
         </div>

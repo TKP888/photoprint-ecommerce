@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import Toast from "@/components/ui/Toast";
 
 export interface CartItem {
   id: string;
@@ -8,11 +9,20 @@ export interface CartItem {
   price: number;
   imageUrl: string;
   quantity: number;
+  stock: number | null;
+}
+
+interface ToastState {
+  show: boolean;
+  productName: string;
+  productImage: string;
+  isError?: boolean;
+  message?: string;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (item: Omit<CartItem, "quantity">) => void;
+  addToCart: (item: Omit<CartItem, "quantity"> & { stock?: number | null }) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -33,12 +43,25 @@ export function useCart() {
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [toast, setToast] = useState<ToastState>({
+    show: false,
+    productName: "",
+    productImage: "",
+    isError: false,
+    message: undefined,
+  });
 
   useEffect(() => {
     const savedCart = localStorage.getItem("cart");
     if (savedCart) {
       try {
-        setItems(JSON.parse(savedCart));
+        const parsedItems = JSON.parse(savedCart);
+        // Migrate old cart items that don't have stock field
+        const migratedItems = parsedItems.map((item: CartItem) => ({
+          ...item,
+          stock: item.stock ?? null,
+        }));
+        setItems(migratedItems);
       } catch (error) {
         console.error("Error loading cart from localStorage:", error);
       }
@@ -52,18 +75,52 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [items, isLoaded]);
 
-  const addToCart = (item: Omit<CartItem, "quantity">) => {
+  const addToCart = (item: Omit<CartItem, "quantity"> & { stock?: number | null }) => {
+    const stock = item.stock ?? null;
+    let shouldShowError = false;
+    
     setItems((prevItems) => {
       const existingItem = prevItems.find((i) => i.id === item.id);
+      const currentQuantity = existingItem ? existingItem.quantity : 0;
+      const newQuantity = currentQuantity + 1;
+
+      // Validate stock limit
+      if (stock !== null && newQuantity > stock) {
+        shouldShowError = true;
+        return prevItems; // Don't update cart
+      }
 
       if (existingItem) {
         return prevItems.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          i.id === item.id ? { ...i, quantity: newQuantity, stock } : i
         );
       } else {
-        return [...prevItems, { ...item, quantity: 1 }];
+        return [...prevItems, { ...item, quantity: 1, stock }];
       }
     });
+
+    // Show toast notification
+    if (shouldShowError) {
+      setToast({
+        show: true,
+        productName: item.name,
+        productImage: item.imageUrl,
+        isError: true,
+        message: `Only ${stock} available in stock`,
+      });
+    } else {
+      setToast({
+        show: true,
+        productName: item.name,
+        productImage: item.imageUrl,
+        isError: false,
+        message: "Added to cart",
+      });
+    }
+  };
+
+  const closeToast = () => {
+    setToast({ show: false, productName: "", productImage: "" });
   };
 
   const removeFromCart = (id: string) => {
@@ -75,9 +132,29 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       removeFromCart(id);
       return;
     }
-    setItems((prevItems) =>
-      prevItems.map((i) => (i.id === id ? { ...i, quantity } : i))
-    );
+    
+    setItems((prevItems) => {
+      const item = prevItems.find((i) => i.id === id);
+      if (!item) return prevItems;
+
+      // Validate stock limit
+      if (item.stock !== null && quantity > item.stock) {
+        // Cap at stock limit and show error toast
+        const cappedQuantity = item.stock;
+        setToast({
+          show: true,
+          productName: item.name,
+          productImage: item.imageUrl,
+          isError: true,
+          message: `Only ${item.stock} available in stock`,
+        });
+        return prevItems.map((i) =>
+          i.id === id ? { ...i, quantity: cappedQuantity } : i
+        );
+      }
+
+      return prevItems.map((i) => (i.id === id ? { ...i, quantity } : i));
+    });
   };
 
   const clearCart = () => {
@@ -102,5 +179,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     getTotalItems,
   };
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider value={value}>
+      {children}
+      {toast.show && (
+        <Toast
+          message={toast.message || (toast.isError ? "Stock limit reached" : "Added to cart")}
+          productName={toast.productName}
+          productImage={toast.productImage}
+          onClose={closeToast}
+          duration={3000}
+          isError={toast.isError}
+        />
+      )}
+    </CartContext.Provider>
+  );
 }

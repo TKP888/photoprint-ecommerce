@@ -9,6 +9,8 @@ interface ProductCardProps {
   price: number;
   imageUrl: string;
   description?: string;
+  stock?: number | null;
+  stockQuantity?: number | null;
 }
 
 export default function ProductCard({
@@ -17,18 +19,35 @@ export default function ProductCard({
   price,
   imageUrl,
   description,
+  stock,
+  stockQuantity,
 }: ProductCardProps) {
-  const { addToCart } = useCart();
+  const { addToCart, items } = useCart();
+
+  // Determine stock value (prefer stock, fallback to stockQuantity)
+  const currentStock = stock !== null && stock !== undefined 
+    ? stock 
+    : (stockQuantity !== null && stockQuantity !== undefined ? stockQuantity : null);
+  
+  const isSoldOut = currentStock !== null && currentStock <= 0;
+  
+  // Check current cart quantity
+  const cartItem = items.find((item) => item.id === id);
+  const cartQuantity = cartItem ? cartItem.quantity : 0;
+  const isAtMaxStock = currentStock !== null && cartQuantity >= currentStock;
 
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (isSoldOut || isAtMaxStock) return;
 
     addToCart({
       id,
       name,
       price,
       imageUrl,
+      stock: currentStock,
     });
   };
 
@@ -52,13 +71,31 @@ export default function ProductCard({
           )}
           <div className="flex justify-between items-center">
             <span className="text-2xl font-bold text-blue-600">£{price}</span>
-            <button
-              type="button"
-              onClick={handleAddToCart}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-            >
-              Add to Cart
-            </button>
+            {isSoldOut ? (
+              <button
+                type="button"
+                disabled
+                className="bg-gray-400 text-white px-4 py-2 rounded cursor-not-allowed"
+              >
+                Sold Out
+              </button>
+            ) : isAtMaxStock ? (
+              <button
+                type="button"
+                disabled
+                className="bg-gray-400 text-white px-4 py-2 rounded cursor-not-allowed text-xs"
+              >
+                Max Qty
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors cursor-pointer"
+              >
+                Add to Cart
+              </button>
+            )}
           </div>
         </div>
       </div>

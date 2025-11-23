@@ -25,6 +25,8 @@ export default async function ProductPage() {
               price={product.price}
               imageUrl={product.image_url}
               description={product.description}
+              stock={(product as any).stock}
+              stockQuantity={(product as any).stock_quantity}
             />
           ))}
         </div>

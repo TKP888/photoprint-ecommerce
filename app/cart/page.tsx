@@ -62,12 +62,19 @@ export default function CartPage() {
                       <input
                         type="number"
                         min="1"
+                        max={item.stock !== null ? item.stock : undefined}
                         value={item.quantity}
-                        onChange={(e) =>
-                          updateQuantity(item.id, parseInt(e.target.value) || 1)
-                        }
+                        onChange={(e) => {
+                          const newQuantity = parseInt(e.target.value) || 1;
+                          updateQuantity(item.id, newQuantity);
+                        }}
                         className="ml-2 w-16 px-2 py-1 border rounded"
                       />
+                      {item.stock !== null && (
+                        <span className="text-xs text-gray-500 ml-2">
+                          (Max: {item.stock})
+                        </span>
+                      )}
                     </label>
                     <button
                       onClick={() => removeFromCart(item.id)}
@@ -76,6 +83,11 @@ export default function CartPage() {
                       Remove
                     </button>
                   </div>
+                  {item.stock !== null && item.quantity >= item.stock && (
+                    <p className="text-red-600 text-sm mt-1">
+                      Maximum quantity reached
+                    </p>
+                  )}
                   <p className="text-gray-600 mt-2">
                     Subtotal: £{(item.price * item.quantity).toFixed(2)}
                   </p>

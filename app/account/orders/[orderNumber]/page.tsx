@@ -42,6 +42,15 @@ export default function OrderDetailPage() {
     if (!user || !orderNumber) return;
 
     const fetchOrder = async () => {
+      // First, update order statuses if needed
+      try {
+        await fetch("/api/orders/update-status", { method: "POST" });
+      } catch (error) {
+        console.error("Error updating order statuses:", error);
+        // Continue anyway - status update is not critical
+      }
+
+      // Then fetch the order
       const supabase = createClient();
       const { data, error } = await supabase
         .from("orders")
@@ -115,6 +124,8 @@ export default function OrderDetailPage() {
           className={`px-4 py-2 rounded-full text-sm font-medium border ${
             order.status === "pending"
               ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+              : order.status === "shipped"
+              ? "bg-purple-500/20 text-purple-400 border-purple-500/30"
               : order.status === "delivered"
               ? "bg-green-500/20 text-green-400 border-green-500/30"
               : "bg-blue-500/20 text-blue-400 border-blue-500/30"
@@ -174,7 +185,7 @@ export default function OrderDetailPage() {
               {order.shipping_info.city}, {order.shipping_info.postcode}
             </p>
             <p>{order.shipping_info.country}</p>
-            <p className="mt-4 text-gray-400">{order.shipping_info.email}</p>
+            {/* <p className="mt-4 text-gray-400">{order.shipping_info.email}</p> */}
           </div>
         </div>
       </div>

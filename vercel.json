@@ -1,0 +1,9 @@
+{
+  "crons": [
+    {
+      "path": "/api/orders/update-status",
+      "schedule": "0 * * * *"
+    }
+  ]
+}
+

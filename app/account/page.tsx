@@ -67,7 +67,7 @@ export default function AccountDashboardPage() {
             Jump back to items you were browsing.
           </p>
           <Link
-            href="/account/recent"
+            href="/account/recently-viewed"
             className="inline-flex items-center text-blue-400 hover:text-blue-200"
           >
             View recently viewed →

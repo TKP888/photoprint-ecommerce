@@ -253,21 +253,7 @@ export default function AddressesPage() {
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Label (optional)
-                </label>
-                <input
-                  type="text"
-                  value={formData.label}
-                  onChange={(e) =>
-                    setFormData({ ...formData, label: e.target.value })
-                  }
-                  placeholder="e.g., Home, Work"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Email *
                 </label>
@@ -280,7 +266,7 @@ export default function AddressesPage() {
                   }
                   className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-              </div>
+              </div> */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   First Name *
@@ -306,6 +292,20 @@ export default function AddressesPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, last_name: e.target.value })
                   }
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Label (optional)
+                </label>
+                <input
+                  type="text"
+                  value={formData.label}
+                  onChange={(e) =>
+                    setFormData({ ...formData, label: e.target.value })
+                  }
+                  placeholder="e.g., Home, Work"
                   className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -517,7 +517,7 @@ export default function AddressesPage() {
                 </p>
                 <p>{address.country}</p>
                 {address.phone && <p className="mt-2">{address.phone}</p>}
-                <p className="text-gray-400 text-sm">{address.email}</p>
+                {/* <p className="text-gray-400 text-sm">{address.email}</p> */}
               </div>
 
               <div className="flex gap-2 text-xs text-gray-400 pt-4 border-t border-gray-700">

@@ -1,0 +1,77 @@
+import { createAdminClient } from "@/lib/supabase/admin";
+import { NextResponse } from "next/server";
+
+export async function POST(request: Request) {
+  try {
+    const adminSupabase = createAdminClient();
+    const now = new Date();
+
+    // Fetch all orders that need status updates
+    const { data: orders, error: fetchError } = await adminSupabase
+      .from("orders")
+      .select("id, created_at, status")
+      .in("status", ["pending", "shipped"]);
+
+    if (fetchError) {
+      throw fetchError;
+    }
+
+    if (!orders || orders.length === 0) {
+      return NextResponse.json({
+        success: true,
+        updated: 0,
+        message: "No orders need status updates",
+      });
+    }
+
+    let updatedCount = 0;
+
+    for (const order of orders) {
+      const orderDate = new Date(order.created_at);
+      const hoursSinceOrder = (now.getTime() - orderDate.getTime()) / (1000 * 60 * 60);
+
+      let newStatus: string | null = null;
+
+      if (order.status === "pending" && hoursSinceOrder >= 24) {
+        newStatus = "shipped";
+      } else if (order.status === "shipped" && hoursSinceOrder >= 72) {
+        // 24 hours (pending->shipped) + 48 hours (shipped->delivered) = 72 hours total
+        newStatus = "delivered";
+      }
+
+      if (newStatus) {
+        const { error: updateError } = await adminSupabase
+          .from("orders")
+          .update({ status: newStatus, updated_at: now.toISOString() })
+          .eq("id", order.id);
+
+        if (!updateError) {
+          updatedCount++;
+        } else {
+          console.error(`Failed to update order ${order.id}:`, updateError);
+        }
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      updated: updatedCount,
+      message: `Updated ${updatedCount} order(s)`,
+    });
+  } catch (error: any) {
+    console.error("Error updating order statuses:", error);
+    return NextResponse.json(
+      {
+        error: "Failed to update order statuses",
+        message: error?.message || "Unknown error",
+      },
+      { status: 500 }
+    );
+  }
+}
+
+// Also allow GET for easy testing
+export async function GET() {
+  return POST(new Request("", { method: "POST" }));
+}
+

@@ -8,6 +8,7 @@ import { useRequireAuth } from "@/components/auth/useRequireAuth";
 const navItems = [
   { label: "Dashboard", href: "/account" },
   { label: "Orders", href: "/account/orders" },
+  { label: "Recently Viewed", href: "/account/recently-viewed" },
   { label: "Addresses", href: "/account/addresses" },
   { label: "Payment Methods", href: "/account/payments" },
 ];

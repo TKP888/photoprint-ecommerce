@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/client";
 import { notFound } from "next/navigation";
 import AddToCartButton from "@/components/product/AddToCartButton";
 import ProductCard from "@/components/ui/ProductCard";
+import TrackProductView from "@/components/product/TrackProductView";
 
 interface ProductDetailPageProps {
   params: Promise<{ id: string }>;
@@ -44,6 +45,7 @@ export default async function ProductDetailPage({
 
   return (
     <main className="py-8 bg-gray-800">
+      <TrackProductView productId={id} />
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
@@ -69,6 +71,8 @@ export default async function ProductDetailPage({
               name={product.name}
               price={product.price}
               imageUrl={product.image_url}
+              stock={(product as any).stock}
+              stockQuantity={(product as any).stock_quantity}
             />
           </div>
         </div>
@@ -85,6 +89,8 @@ export default async function ProductDetailPage({
                   price={otherProduct.price}
                   imageUrl={otherProduct.image_url}
                   description={otherProduct.description}
+                  stock={(otherProduct as any).stock}
+                  stockQuantity={(otherProduct as any).stock_quantity}
                 />
               ))}
             </div>

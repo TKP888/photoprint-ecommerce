@@ -510,7 +510,10 @@ export default function CheckoutPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create order");
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage =
+          errorData.message || errorData.error || "Failed to create order";
+        throw new Error(errorMessage);
       }
 
       const result = await response.json();
@@ -519,7 +522,11 @@ export default function CheckoutPage() {
       router.push(`/checkout/success?orderNumber=${result.orderNumber}`);
     } catch (error) {
       console.error("Error creating order:", error);
-      alert("Failed to create order. Please try again.");
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to create order. Please try again.";
+      alert(errorMessage);
       setIsSubmitting(false);
     }
   };
