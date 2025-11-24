@@ -32,6 +32,11 @@ export default function Footer() {
                 Services
               </a>
             </li>
+            <li>
+              <a href="/contact" className="hover:text-blue-400">
+                Contact Us
+              </a>
+            </li>
           </ul>
         </div>
 
