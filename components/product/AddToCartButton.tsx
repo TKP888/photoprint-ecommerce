@@ -22,12 +22,15 @@ export default function AddToCartButton({
   const { addToCart, items } = useCart();
 
   // Determine stock value (prefer stock, fallback to stockQuantity)
-  const currentStock = stock !== null && stock !== undefined 
-    ? stock 
-    : (stockQuantity !== null && stockQuantity !== undefined ? stockQuantity : null);
-  
+  const currentStock =
+    stock !== null && stock !== undefined
+      ? stock
+      : stockQuantity !== null && stockQuantity !== undefined
+      ? stockQuantity
+      : null;
+
   const isSoldOut = currentStock !== null && currentStock <= 0;
-  
+
   // Check current cart quantity
   const cartItem = items.find((item) => item.id === id);
   const cartQuantity = cartItem ? cartItem.quantity : 0;
@@ -75,4 +78,3 @@ export default function AddToCartButton({
     </>
   );
 }
-

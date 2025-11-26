@@ -25,12 +25,15 @@ export default function ProductCard({
   const { addToCart, items } = useCart();
 
   // Determine stock value (prefer stock, fallback to stockQuantity)
-  const currentStock = stock !== null && stock !== undefined 
-    ? stock 
-    : (stockQuantity !== null && stockQuantity !== undefined ? stockQuantity : null);
-  
+  const currentStock =
+    stock !== null && stock !== undefined
+      ? stock
+      : stockQuantity !== null && stockQuantity !== undefined
+      ? stockQuantity
+      : null;
+
   const isSoldOut = currentStock !== null && currentStock <= 0;
-  
+
   // Check current cart quantity
   const cartItem = items.find((item) => item.id === id);
   const cartQuantity = cartItem ? cartItem.quantity : 0;
@@ -75,7 +78,7 @@ export default function ProductCard({
               <button
                 type="button"
                 disabled
-                className="bg-gray-400 text-white px-4 py-2 rounded cursor-not-allowed"
+                className="bg-gray-600 text-white font-bold px-4 py-2 rounded cursor-not-allowed"
               >
                 Sold Out
               </button>
@@ -83,7 +86,7 @@ export default function ProductCard({
               <button
                 type="button"
                 disabled
-                className="bg-gray-400 text-white px-4 py-2 rounded cursor-not-allowed text-xs"
+                className="bg-gray-600 text-white font-bold px-4 py-2 rounded cursor-not-allowed text-xs"
               >
                 Max Qty
               </button>
@@ -91,7 +94,7 @@ export default function ProductCard({
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors cursor-pointer"
+                className="bg-blue-500 text-white font-bold px-4 py-2 rounded hover:bg-blue-600 transition-colors cursor-pointer"
               >
                 Add to Cart
               </button>
