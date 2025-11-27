@@ -36,7 +36,7 @@ export default function LimitedEditionCard({
           {title}
         </h2>
 
-        <div className="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-lg font-medium hover:bg-white/30 transition-all duration-300 border border-white/30 hover:border-white/50 inline-block">
+        <div className="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-lg font-extrabold hover:bg-white/30 transition-all duration-300 border border-white/30 hover:border-white/50 inline-block">
           Shop
         </div>
       </div>

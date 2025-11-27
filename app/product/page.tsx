@@ -2,6 +2,7 @@ import ProductCard from "@/components/ui/ProductCard";
 import ProductFilters from "@/components/product/ProductFilters";
 import { createClient } from "@/lib/supabase/client";
 import { buildProductQuery } from "@/lib/products/filterProducts";
+import Link from "next/link";
 
 interface ProductPageProps {
   searchParams: Promise<{
@@ -31,7 +32,7 @@ export default async function ProductPage({ searchParams }: ProductPageProps) {
   if (error) {
     console.error("Error fetching products:", error);
     return (
-      <main className="py-8 bg-gray-800">
+      <main className="py-8 bg-gray-800 flex-1">
         <div className="container mx-auto px-4">
           <div className="bg-red-500/20 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg">
             Error loading products. Please try again.
@@ -63,7 +64,7 @@ export default async function ProductPage({ searchParams }: ProductPageProps) {
     params.minPrice || params.maxPrice || params.inStock === "true";
 
   return (
-    <main className="py-8 bg-gray-800">
+    <main className="py-8 bg-gray-800 flex-1">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -112,12 +113,12 @@ export default async function ProductPage({ searchParams }: ProductPageProps) {
                 : "No products available at the moment"}
             </p>
             {(hasSearch || hasFilters) && (
-              <a
+              <Link
                 href="/product"
                 className="inline-block text-blue-500 hover:text-blue-600 underline text-sm"
               >
                 Clear search and filters
-              </a>
+              </Link>
             )}
           </div>
         )}

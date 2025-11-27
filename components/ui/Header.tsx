@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import SearchDropdown from "@/components/ui/SearchDropdown";
 
 export default function Header() {
   const {
@@ -89,72 +90,93 @@ export default function Header() {
           <div className="hidden md:flex items-center gap-4 flex-shrink-0">
             {/* Search - Icon or Expanded Bar */}
             {isSearchOpen ? (
-              <form onSubmit={handleSearch} className="relative">
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onBlur={(e) => {
-                    // Don't close if clicking the submit button
-                    if (
-                      !e.relatedTarget ||
-                      (e.relatedTarget as HTMLElement).type !== "submit"
-                    ) {
+              <div className="relative">
+                <form onSubmit={handleSearch} className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => {
+                      // Keep search open when focused
+                    }}
+                    onBlur={(e) => {
+                      // Don't close if clicking the submit button or dropdown
+                      const relatedTarget = e.relatedTarget as HTMLElement;
+                      if (
+                        relatedTarget &&
+                        (relatedTarget.type === "submit" ||
+                          relatedTarget.closest('[data-search-dropdown]'))
+                      ) {
+                        return;
+                      }
                       // Only close if input is empty
                       if (!searchQuery.trim()) {
                         setIsSearchOpen(false);
                       }
-                    }
-                  }}
-                  className="w-64 px-4 py-2 pl-10 pr-10 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 bg-white transition-all"
-                  autoFocus
-                />
-                <button
-                  type="submit"
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  aria-label="Search"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                    }}
+                    className="w-64 px-4 py-2 pl-10 pr-10 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 bg-white transition-all"
+                    autoFocus
+                  />
+                  <button
+                    type="submit"
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    aria-label="Search"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsSearchOpen(false);
-                    setSearchQuery("");
-                  }}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  aria-label="Close search"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSearchOpen(false);
+                      setSearchQuery("");
+                    }}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    aria-label="Close search"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </form>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </form>
+                <div data-search-dropdown>
+                  <SearchDropdown
+                    searchQuery={searchQuery}
+                    isOpen={isSearchOpen && searchQuery.trim().length >= 2}
+                    onClose={() => {
+                      // Only close dropdown, not the search input
+                    }}
+                    onSelectProduct={() => {
+                      setSearchQuery("");
+                      setIsSearchOpen(false);
+                    }}
+                  />
+                </div>
+              </div>
             ) : (
               <button
                 type="button"
@@ -626,49 +648,68 @@ export default function Header() {
         >
           <div className="px-4 py-4 space-y-2">
             {/* Search Bar - Mobile */}
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (searchQuery.trim()) {
-                  router.push(
-                    `/product?search=${encodeURIComponent(searchQuery.trim())}`
-                  );
-                  setSearchQuery("");
-                  setIsMenuOpen(false);
-                }
-              }}
-              className="mb-4"
-            >
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-2 pl-10 pr-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 bg-white"
-                />
-                <button
-                  type="submit"
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  aria-label="Search"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+            <div className="mb-4 relative">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (searchQuery.trim()) {
+                    router.push(
+                      `/product?search=${encodeURIComponent(searchQuery.trim())}`
+                    );
+                    setSearchQuery("");
+                    setIsMenuOpen(false);
+                  }
+                }}
+              >
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => {
+                      // Keep search open when focused
+                    }}
+                    className="w-full px-4 py-2 pl-10 pr-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 bg-white"
+                  />
+                  <button
+                    type="submit"
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    aria-label="Search"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </form>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </form>
+              {isMenuOpen && (
+                <div data-search-dropdown>
+                  <SearchDropdown
+                    searchQuery={searchQuery}
+                    isOpen={isMenuOpen && searchQuery.trim().length >= 2}
+                    onClose={() => {
+                      // Only close dropdown, not the search input
+                    }}
+                    onSelectProduct={() => {
+                      setSearchQuery("");
+                      setIsMenuOpen(false);
+                    }}
+                  />
+                </div>
+              )}
+            </div>
 
             {/* Navigation Links */}
             <div className="space-y-1">

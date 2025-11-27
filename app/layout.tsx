@@ -35,7 +35,7 @@ export default function RootLayout({
         <CartProvider>
           <AuthProvider>
             <Header />
-            <div className="flex-1">
+            <div className="flex-1 flex flex-col">
               {children}
             </div>
             <Footer />
