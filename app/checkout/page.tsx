@@ -40,7 +40,6 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Saved addresses and payment methods
   const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
   const [savedPaymentMethods, setSavedPaymentMethods] = useState<
     SavedPaymentMethod[]
@@ -55,7 +54,6 @@ export default function CheckoutPage() {
   const [saveBillingAddress, setSaveBillingAddress] = useState(false);
   const [savePaymentMethod, setSavePaymentMethod] = useState(false);
 
-  // Form state
   const [shippingInfo, setShippingInfo] = useState({
     firstName: "",
     lastName: "",
@@ -84,14 +82,11 @@ export default function CheckoutPage() {
     cardName: "",
   });
 
-  // Redirect if cart is empty
   useEffect(() => {
     if (items.length === 0) {
-      router.replace("/cart"); // replace avoids back-button issues
+      router.replace("/cart");
     }
   }, [items, router]);
-
-  // Helper functions to fill forms from saved data
   const fillShippingForm = useCallback((address: SavedAddress) => {
     setShippingInfo({
       firstName: address.first_name,
@@ -122,8 +117,6 @@ export default function CheckoutPage() {
   }, []);
 
   const fillPaymentForm = useCallback((paymentMethod: SavedPaymentMethod) => {
-    // We can't fill the full card number, but we can show the last 4
-    // For security, we'll just pre-fill the expiry date
     const formattedExpiry = `${String(paymentMethod.exp_month).padStart(
       2,
       "0"
@@ -135,14 +128,12 @@ export default function CheckoutPage() {
     }));
   }, []);
 
-  // Fetch saved addresses and payment methods if user is logged in
   useEffect(() => {
     if (!user) return;
 
     const fetchSavedData = async () => {
       const supabase = createClient();
 
-      // Fetch addresses
       const { data: addresses } = await supabase
         .from("addresses")
         .select("*")
@@ -151,7 +142,6 @@ export default function CheckoutPage() {
 
       if (addresses) {
         setSavedAddresses(addresses);
-        // Auto-select default shipping address if available
         const defaultShipping = addresses.find(
           (addr) => addr.is_default && addr.is_shipping
         );
@@ -160,7 +150,6 @@ export default function CheckoutPage() {
         }
       }
 
-      // Fetch payment methods
       const { data: paymentMethods } = await supabase
         .from("payment_methods")
         .select("*")
@@ -169,7 +158,6 @@ export default function CheckoutPage() {
 
       if (paymentMethods) {
         setSavedPaymentMethods(paymentMethods);
-        // Auto-select default payment method if available
         const defaultPayment = paymentMethods.find((pm) => pm.is_default);
         if (defaultPayment) {
           setSelectedPaymentMethodId(defaultPayment.id);
@@ -180,7 +168,6 @@ export default function CheckoutPage() {
     fetchSavedData();
   }, [user]);
 
-  // Auto-fill forms when saved data is selected
   useEffect(() => {
     if (selectedShippingAddressId) {
       const address = savedAddresses.find(
@@ -204,14 +191,11 @@ export default function CheckoutPage() {
   }, [selectedPaymentMethodId, savedPaymentMethods, fillPaymentForm]);
 
   if (items.length === 0) {
-    return null; // or a spinner
+    return null;
   }
-
-  // Handle address selection
   const handleShippingAddressSelect = (addressId: string) => {
     setSelectedShippingAddressId(addressId);
     if (addressId === "") {
-      // Clear form
       setShippingInfo({
         firstName: "",
         lastName: "",
@@ -233,7 +217,6 @@ export default function CheckoutPage() {
   const handleBillingAddressSelect = (addressId: string) => {
     setSelectedBillingAddressId(addressId);
     if (addressId === "") {
-      // Clear form
       setBillingInfo({
         ...billingInfo,
         firstName: "",
@@ -254,7 +237,6 @@ export default function CheckoutPage() {
   const handlePaymentMethodSelect = (paymentMethodId: string) => {
     setSelectedPaymentMethodId(paymentMethodId);
     if (paymentMethodId === "") {
-      // Clear form
       setPaymentInfo({
         cardNumber: "",
         expiryDate: "",
@@ -304,7 +286,6 @@ export default function CheckoutPage() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    // Shipping validation
     if (!shippingInfo.firstName.trim())
       newErrors.shippingFirstName = "First name is required";
     if (!shippingInfo.lastName.trim())
@@ -321,7 +302,6 @@ export default function CheckoutPage() {
     if (!shippingInfo.postcode.trim())
       newErrors.shippingPostcode = "Postcode is required";
 
-    // Billing validation
     if (!billingInfo.sameAsShipping) {
       if (!billingInfo.firstName.trim())
         newErrors.billingFirstName = "First name is required";
@@ -334,11 +314,9 @@ export default function CheckoutPage() {
         newErrors.billingPostcode = "Postcode is required";
     }
 
-    // Payment validation
     if (!paymentInfo.cardNumber.trim())
       newErrors.cardNumber = "Card number is required";
     else if (selectedPaymentMethodId) {
-      // If using saved payment method, allow masked format
       if (
         !/^\*\*\*\*\s?\*\*\*\*\s?\*\*\*\*\s?\d{4}$/.test(
           paymentInfo.cardNumber.replace(/\s/g, "")
@@ -405,9 +383,7 @@ export default function CheckoutPage() {
     try {
       const supabase = createClient();
 
-      // Save addresses if requested and user is logged in
       if (user) {
-        // Save shipping address
         if (saveShippingAddress && !selectedShippingAddressId) {
           const [addressLine1, ...addressLine2Parts] =
             shippingInfo.address.split(", ");
@@ -427,11 +403,10 @@ export default function CheckoutPage() {
             country: shippingInfo.country,
             is_shipping: true,
             is_billing: false,
-            is_default: savedAddresses.length === 0, // First address is default
+            is_default: savedAddresses.length === 0,
           });
         }
 
-        // Save billing address (if different from shipping)
         if (
           saveBillingAddress &&
           !billingInfo.sameAsShipping &&
@@ -446,7 +421,7 @@ export default function CheckoutPage() {
             label: null,
             first_name: billingInfo.firstName,
             last_name: billingInfo.lastName,
-            email: shippingInfo.email, // Use shipping email
+            email: shippingInfo.email,
             phone: shippingInfo.phone || null,
             address_line1: addressLine1,
             address_line2: addressLine2,
@@ -459,16 +434,13 @@ export default function CheckoutPage() {
           });
         }
 
-        // Save payment method if requested
         if (savePaymentMethod && !selectedPaymentMethodId) {
-          // Extract last 4 digits and brand from card number
           const cardNumberDigits = paymentInfo.cardNumber.replace(/\s/g, "");
           const last4 = cardNumberDigits.slice(-4);
           const [monthStr, yearStr] = paymentInfo.expiryDate.split("/");
           const expMonth = parseInt(monthStr, 10);
-          const expYear = 2000 + parseInt(yearStr, 10); // Convert YY to YYYY
+          const expYear = 2000 + parseInt(yearStr, 10);
 
-          // Try to detect brand from card number (simplified)
           let brand = "Other";
           if (cardNumberDigits.startsWith("4")) brand = "Visa";
           else if (cardNumberDigits.startsWith("5")) brand = "Mastercard";
@@ -480,17 +452,15 @@ export default function CheckoutPage() {
             last4,
             exp_month: expMonth,
             exp_year: expYear,
-            is_default: savedPaymentMethods.length === 0, // First payment method is default
+            is_default: savedPaymentMethods.length === 0,
           });
         }
       }
 
-      // Calculate totals
       const subtotal = getTotalPrice();
-      const shippingCost = 5.99; // Your shipping cost
+      const shippingCost = 5.99;
       const finalTotal = subtotal + shippingCost;
 
-      // Prepare order data to send to API
       const orderData = {
         items,
         shippingInfo,
@@ -500,7 +470,6 @@ export default function CheckoutPage() {
         total: finalTotal,
       };
 
-      // Call API route to save order
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: {
@@ -518,7 +487,6 @@ export default function CheckoutPage() {
 
       const result = await response.json();
 
-      // Redirect to success page with order number
       router.push(`/checkout/success?orderNumber=${result.orderNumber}`);
     } catch (error) {
       console.error("Error creating order:", error);
@@ -532,7 +500,7 @@ export default function CheckoutPage() {
   };
 
   const subtotal = getTotalPrice();
-  const shipping = 5.99; // Fixed shipping cost
+  const shipping = 5.99;
   const total = subtotal + shipping;
 
   return (
@@ -542,9 +510,7 @@ export default function CheckoutPage() {
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Column - Forms */}
             <div className="lg:col-span-2 space-y-8">
-              {/* Shipping Information */}
               <section className="bg-white rounded-lg shadow-md p-6">
                 <h2 className="text-2xl font-bold mb-6 text-gray-800">
                   Shipping Information
@@ -795,7 +761,6 @@ export default function CheckoutPage() {
                 </div>
               </section>
 
-              {/* Billing Information */}
               <section className="bg-white rounded-lg shadow-md p-6">
                 <h2 className="text-2xl font-bold mb-6 text-gray-800">
                   Billing Information
@@ -1020,7 +985,6 @@ export default function CheckoutPage() {
                 )}
               </section>
 
-              {/* Payment Information */}
               <section className="bg-white rounded-lg shadow-md p-6">
                 <h2 className="text-2xl font-bold mb-6 text-gray-800">
                   Payment Information
@@ -1178,7 +1142,6 @@ export default function CheckoutPage() {
               </section>
             </div>
 
-            {/* Right Column - Order Summary */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
                 <h2 className="text-xl font-bold text-gray-800 mb-4">

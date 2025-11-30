@@ -18,47 +18,62 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <a href="/about" className="hover:text-blue-400">
+              <Link href="/about" className="hover:text-blue-400">
                 About
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="/product" className="hover:text-blue-400">
+              <Link href="/product" className="hover:text-blue-400">
                 Products
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="/services" className="hover:text-blue-400">
+              <Link href="/services" className="hover:text-blue-400">
                 Services
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="/contact" className="hover:text-blue-400">
+              <Link href="/contact" className="hover:text-blue-400">
                 Contact Us
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
 
         <div>
           <h3 className="font-semibold mb-4">Contact</h3>
-          <p className="text-gray-400">antony@photoprint.co.uk</p>
-          <p className="text-gray-400">+44 7500 000 000</p>
+          <p className="text-gray-400">antonypetsas@gmail.com</p>
+
           <div className="flex space-x-4 mt-2">
-            <a href="#" className="hover:text-blue-400">
-              Twitter
-            </a>
-            <a href="#" className="hover:text-blue-400">
+            <a
+              href="https://www.linkedin.com/in/akpetsas/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-blue-400"
+            >
               LinkedIn
             </a>
-            <a href="#" className="hover:text-blue-400">
-              Instagram
+            <a
+              href="https://github.com/TKP888"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-blue-400"
+            >
+              GitHub
+            </a>
+            <a
+              href="https://antonypetsas.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-blue-400"
+            >
+              Website
             </a>
           </div>
         </div>
       </div>
       <div className="mt-10 border-t border-gray-700 pt-6 text-center text-gray-500 text-sm">
-        &copy; 2025 PhotoPrint. All rights reserved.
+        &copy; Antony Petsas 2025, All Rights Reserved
       </div>
     </footer>
   );

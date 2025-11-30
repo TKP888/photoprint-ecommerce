@@ -18,12 +18,10 @@ export async function POST(request: Request) {
       data: { user },
     } = await supabase.auth.getUser();
 
-    // Only track for authenticated users
     if (!user) {
       return NextResponse.json({ success: true, message: "Not authenticated" });
     }
 
-    // Always insert a new record to maintain full view history
     const now = new Date().toISOString();
     const { error } = await supabase.from("recently_viewed").insert({
       user_id: user.id,

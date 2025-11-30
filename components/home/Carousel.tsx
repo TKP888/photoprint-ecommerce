@@ -36,27 +36,22 @@ export default function Carousel() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Auto-advance carousel every 5 seconds
   useEffect(() => {
-    // Set up interval for auto-advance
     intervalRef.current = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000); // 5 seconds
+    }, 5000);
 
-    // Cleanup on unmount
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
     };
-  }, []); // Only run once on mount
+  }, []);
 
-  // Function to reset the auto-advance timer
   const resetTimer = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-    // Restart the interval
     intervalRef.current = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
@@ -78,7 +73,6 @@ export default function Carousel() {
   };
   return (
     <section className="relative h-96 md:h-[800px] flex items-center justify-center overflow-hidden">
-      {/* Slides Container */}
       <div
         className="flex transition-transform duration-500 ease-in-out h-full"
         style={{
@@ -94,7 +88,6 @@ export default function Carousel() {
               width: "100%",
             }}
           >
-            {/* Background Image */}
             <div
               className="absolute inset-0 bg-cover bg-center"
               style={{
@@ -104,7 +97,6 @@ export default function Carousel() {
               <div className="absolute inset-0 bg-black opacity-20"></div>
             </div>
 
-            {/* Text Overlay */}
             <div className="relative z-10 bg-black py-4 px-4 text-white">
               <h1 className="text-4xl md:text-6xl font-bold mb-4">
                 {slide.title}

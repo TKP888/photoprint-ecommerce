@@ -6,14 +6,12 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // Regular server client (has access to auth cookies)
     const serverSupabase = createClient();
     const {
       data: { user },
     } = await serverSupabase.auth.getUser();
     const userId = user?.id || null;
 
-    // Admin client (service role) for database insert
     const adminSupabase = createAdminClient();
 
     const orderNumber = `ORD-${Date.now()}-${Math.random()
@@ -23,12 +21,9 @@ export async function POST(request: Request) {
     const { items, shippingInfo, billingInfo, subtotal, shippingCost, total } =
       body;
 
-    // First, check stock levels and prepare stock updates
     const stockUpdates: Array<{ id: string; newStock: number; fieldName: string }> = [];
     
     for (const item of items) {
-      // Fetch current product to check stock
-      // Select all fields to avoid errors if stock fields don't exist
       const { data: product, error: productError } = await adminSupabase
         .from("products")
         .select("*")
@@ -39,15 +34,12 @@ export async function POST(request: Request) {
         throw new Error(`Product ${item.id} not found`);
       }
 
-      // Determine which stock field exists (prefer 'stock', fallback to 'stock_quantity')
-      // Handle null/undefined values - check if field exists in the product object
       const hasStockField = 'stock' in product && product.stock !== null && product.stock !== undefined;
       const hasStockQuantityField = 'stock_quantity' in product && product.stock_quantity !== null && product.stock_quantity !== undefined;
       
       const stockField = hasStockField ? 'stock' : (hasStockQuantityField ? 'stock_quantity' : null);
       const stockValue = hasStockField ? product.stock : (hasStockQuantityField ? product.stock_quantity : null);
       
-      // If no stock field exists, skip stock management for this product
       if (stockField === null || stockValue === null) {
         console.warn(`Product ${item.id} (${item.name}) does not have a stock field. Skipping stock update.`);
         continue;
@@ -55,7 +47,6 @@ export async function POST(request: Request) {
       
       const currentStock = stockValue as number;
 
-      // Check if enough stock is available
       if (currentStock < item.quantity) {
         return NextResponse.json(
           {
@@ -66,7 +57,6 @@ export async function POST(request: Request) {
         );
       }
 
-      // Prepare stock update
       stockUpdates.push({
         id: item.id,
         newStock: currentStock - item.quantity,
@@ -82,7 +72,6 @@ export async function POST(request: Request) {
       image_url: item.imageUrl,
     }));
 
-    // Create the order
     const { data, error } = await adminSupabase
       .from("orders")
       .insert({
@@ -104,7 +93,6 @@ export async function POST(request: Request) {
       throw error;
     }
 
-    // Update stock levels for all products in the order
     for (const update of stockUpdates) {
       const updateData: any = {};
       updateData[update.fieldName] = update.newStock;
@@ -119,7 +107,6 @@ export async function POST(request: Request) {
           `Failed to update stock for product ${update.id}:`,
           stockError
         );
-        // Log error but don't fail the order - stock update can be done manually if needed
       }
     }
 

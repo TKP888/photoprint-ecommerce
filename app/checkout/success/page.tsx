@@ -85,7 +85,6 @@ export default function CheckoutSuccessPage() {
     <main className="py-8 bg-gray-800 min-h-screen">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto">
-          {/* Success Icon */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-4">
               <svg
@@ -110,7 +109,6 @@ export default function CheckoutSuccessPage() {
             </p>
           </div>
 
-          {/* Order Details Card */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <div className="border-b pb-4 mb-4">
               <h2 className="text-2xl font-bold text-gray-800 mb-2">
@@ -134,7 +132,6 @@ export default function CheckoutSuccessPage() {
               </p>
             </div>
 
-            {/* Items Ordered */}
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">
                 Items Ordered
@@ -159,7 +156,6 @@ export default function CheckoutSuccessPage() {
               </div>
             </div>
 
-            {/* Shipping Address */}
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 Shipping Address
@@ -178,7 +174,6 @@ export default function CheckoutSuccessPage() {
               </div>
             </div>
 
-            {/* Total */}
             <div className="border-t pt-4 space-y-2">
               <div className="flex justify-between text-gray-600">
                 <span>Subtotal</span>
@@ -199,7 +194,6 @@ export default function CheckoutSuccessPage() {
             </div>
           </div>
 
-          {/* Next Steps */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
             <h3 className="text-lg font-semibold text-blue-800 mb-2">
               What&apos;s Next?
@@ -219,7 +213,6 @@ export default function CheckoutSuccessPage() {
             </ul>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
               href="/product"
@@ -235,7 +228,6 @@ export default function CheckoutSuccessPage() {
             </Link>
           </div>
 
-          {/* Help Text */}
           <div className="text-center mt-8">
             <p className="text-gray-400 text-sm">
               Need help?{" "}

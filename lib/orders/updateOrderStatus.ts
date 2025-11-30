@@ -5,7 +5,6 @@ export async function updateOrderStatusIfNeeded(orderId: string) {
     const adminSupabase = createAdminClient();
     const now = new Date();
 
-    // Fetch the order
     const { data: order, error: fetchError } = await adminSupabase
       .from("orders")
       .select("id, created_at, status")
@@ -16,7 +15,6 @@ export async function updateOrderStatusIfNeeded(orderId: string) {
       return null;
     }
 
-    // If already delivered, no update needed
     if (order.status === "delivered") {
       return order.status;
     }
@@ -29,7 +27,6 @@ export async function updateOrderStatusIfNeeded(orderId: string) {
     if (order.status === "pending" && hoursSinceOrder >= 24) {
       newStatus = "shipped";
     } else if (order.status === "shipped" && hoursSinceOrder >= 72) {
-      // 24 hours (pending->shipped) + 48 hours (shipped->delivered) = 72 hours total
       newStatus = "delivered";
     }
 
@@ -59,7 +56,6 @@ export async function updateAllOrderStatuses() {
     const adminSupabase = createAdminClient();
     const now = new Date();
 
-    // Fetch all orders that need status updates
     const { data: orders, error: fetchError } = await adminSupabase
       .from("orders")
       .select("id, created_at, status")

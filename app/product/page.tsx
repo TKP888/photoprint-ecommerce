@@ -18,7 +18,6 @@ export default async function ProductPage({ searchParams }: ProductPageProps) {
   const params = await searchParams;
   const supabase = createClient();
 
-  // Build query with filters
   const query = buildProductQuery(supabase, {
     search: params.search,
     minPrice: params.minPrice,
@@ -42,13 +41,11 @@ export default async function ProductPage({ searchParams }: ProductPageProps) {
     );
   }
 
-  // Apply stock filter client-side (since we need to check both stock and stock_quantity fields)
   let filteredProducts = products || [];
   if (params.inStock === "true" && filteredProducts.length > 0) {
     filteredProducts = filteredProducts.filter((product: any) => {
       const stock = product.stock;
       const stockQuantity = product.stock_quantity;
-      // Product is in stock if: stock > 0 OR stock_quantity > 0 OR both are null (unlimited)
       return (
         (stock !== null && stock !== undefined && stock > 0) ||
         (stockQuantity !== null &&
@@ -83,10 +80,7 @@ export default async function ProductPage({ searchParams }: ProductPageProps) {
           </div>
         </div>
 
-        {/* Filters Bar */}
         <ProductFilters />
-
-        {/* Products Grid */}
         {filteredProducts && filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredProducts.map((product) => (

@@ -8,19 +8,16 @@ export default function ProductFilters() {
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  // Applied filters (from URL)
   const appliedMinPrice = searchParams.get("minPrice") || "";
   const appliedMaxPrice = searchParams.get("maxPrice") || "";
   const appliedInStock = searchParams.get("inStock") === "true";
   const appliedSort = searchParams.get("sort") || "name_asc";
 
-  // Local state (what user is currently selecting)
   const [minPrice, setMinPrice] = useState(appliedMinPrice);
   const [maxPrice, setMaxPrice] = useState(appliedMaxPrice);
   const [inStock, setInStock] = useState(appliedInStock);
   const [sort, setSort] = useState(appliedSort);
 
-  // Sync local state when URL params change externally
   useEffect(() => {
     setMinPrice(appliedMinPrice);
     setMaxPrice(appliedMaxPrice);
@@ -28,7 +25,6 @@ export default function ProductFilters() {
     setSort(appliedSort);
   }, [appliedMinPrice, appliedMaxPrice, appliedInStock, appliedSort]);
 
-  // Check if there are pending changes (local state differs from applied state)
   const hasPendingChanges = useMemo(() => {
     return (
       minPrice !== appliedMinPrice ||
@@ -51,30 +47,25 @@ export default function ProductFilters() {
     startTransition(() => {
       const params = new URLSearchParams();
 
-      // Preserve search query if it exists
       const search = searchParams.get("search");
       if (search) params.set("search", search);
 
-      // Add filters
       if (minPrice) params.set("minPrice", minPrice);
       if (maxPrice) params.set("maxPrice", maxPrice);
       if (inStock) params.set("inStock", "true");
       if (sort && sort !== "name_asc") params.set("sort", sort);
 
-      // Use replace instead of push to avoid adding to history and improve performance
       router.replace(`/product?${params.toString()}`);
     });
   };
 
   const clearFilters = () => {
     startTransition(() => {
-      // Reset local state
       setMinPrice("");
       setMaxPrice("");
       setInStock(false);
       setSort("name_asc");
 
-      // Clear URL params
       const params = new URLSearchParams();
       const search = searchParams.get("search");
       if (search) params.set("search", search);
@@ -95,9 +86,7 @@ export default function ProductFilters() {
           isPending ? "opacity-75" : ""
         }`}
       >
-        {/* Left side - Filters */}
         <div className="flex flex-wrap items-center gap-4 flex-1">
-          {/* Price Range */}
           <div className="flex items-center gap-2">
             <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
               Price:
@@ -133,7 +122,6 @@ export default function ProductFilters() {
             </div>
           </div>
 
-          {/* Stock Filter */}
           <div className="flex items-center">
             <label className="flex items-center cursor-pointer">
               <input
@@ -148,7 +136,6 @@ export default function ProductFilters() {
             </label>
           </div>
 
-          {/* Sort */}
           <div className="flex items-center gap-2">
             <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
               Sort:
@@ -172,7 +159,6 @@ export default function ProductFilters() {
           </div>
         </div>
 
-        {/* Right side - Action buttons */}
         <div className="flex items-center gap-3">
           {hasPendingChanges && (
             <button

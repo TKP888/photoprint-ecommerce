@@ -1,12 +1,13 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthContext";
 
 export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signUp } = useAuth();
 
   const [form, setForm] = useState({
@@ -16,6 +17,14 @@ export default function SignupPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const redirect = searchParams.get("redirect");
+    if (redirect) {
+      setRedirectUrl(redirect);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -40,7 +49,8 @@ export default function SignupPage() {
       return;
     }
 
-    router.replace("/account");
+    const destination = redirectUrl || "/account";
+    router.replace(destination);
   };
 
   return (
@@ -106,7 +116,14 @@ export default function SignupPage() {
         <div className="mt-6 text-sm text-center text-gray-600">
           <p>
             Already have an account?{" "}
-            <Link href="/auth/login" className="text-blue-500 hover:underline">
+            <Link
+              href={
+                redirectUrl
+                  ? `/auth/login?redirect=${encodeURIComponent(redirectUrl)}`
+                  : "/auth/login"
+              }
+              className="text-blue-500 hover:underline"
+            >
               Sign in
             </Link>
           </p>

@@ -78,7 +78,6 @@ export default function AddressesPage() {
     setError(null);
     const supabase = createClient();
 
-    // If setting as default, unset other defaults first
     if (formData.is_default) {
       const { error: updateError } = await supabase
         .from("addresses")
@@ -92,7 +91,6 @@ export default function AddressesPage() {
     }
 
     if (editingAddress) {
-      // Update existing address
       const { error } = await supabase
         .from("addresses")
         .update({
@@ -107,7 +105,6 @@ export default function AddressesPage() {
         return;
       }
     } else {
-      // Create new address
       const { error } = await supabase.from("addresses").insert({
         ...formData,
         user_id: user.id,
@@ -119,7 +116,6 @@ export default function AddressesPage() {
       }
     }
 
-    // Reset form and refresh
     resetForm();
     fetchAddresses();
   };
@@ -148,14 +144,12 @@ export default function AddressesPage() {
 
     const supabase = createClient();
 
-    // Unset all other defaults
     await supabase
       .from("addresses")
       .update({ is_default: false })
       .eq("user_id", user.id)
       .eq("is_default", true);
 
-    // Set this one as default
     const { error } = await supabase
       .from("addresses")
       .update({ is_default: true })
@@ -245,7 +239,6 @@ export default function AddressesPage() {
         </div>
       )}
 
-      {/* Add/Edit Form */}
       {isFormOpen && (
         <div className="bg-gray-900 rounded-lg border border-gray-700 p-6">
           <h2 className="text-xl font-semibold text-white mb-4">
@@ -454,7 +447,6 @@ export default function AddressesPage() {
         </div>
       )}
 
-      {/* Addresses List */}
       {addresses.length === 0 ? (
         <div className="text-center py-12 bg-gray-900 rounded-lg border border-gray-700">
           <p className="text-gray-400 text-lg mb-4">No saved addresses yet</p>
@@ -517,7 +509,6 @@ export default function AddressesPage() {
                 </p>
                 <p>{address.country}</p>
                 {address.phone && <p className="mt-2">{address.phone}</p>}
-                {/* <p className="text-gray-400 text-sm">{address.email}</p> */}
               </div>
 
               <div className="flex gap-2 text-xs text-gray-400 pt-4 border-t border-gray-700">

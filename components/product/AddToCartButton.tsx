@@ -21,7 +21,6 @@ export default function AddToCartButton({
 }: AddToCartButtonProps) {
   const { addToCart, items } = useCart();
 
-  // Determine stock value (prefer stock, fallback to stockQuantity)
   const currentStock =
     stock !== null && stock !== undefined
       ? stock
@@ -31,7 +30,6 @@ export default function AddToCartButton({
 
   const isSoldOut = currentStock !== null && currentStock <= 0;
 
-  // Check current cart quantity
   const cartItem = items.find((item) => item.id === id);
   const cartQuantity = cartItem ? cartItem.quantity : 0;
   const isAtMaxStock = currentStock !== null && cartQuantity >= currentStock;

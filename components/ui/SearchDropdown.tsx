@@ -34,14 +34,11 @@ export default function SearchDropdown({
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
 
-  // Debounced search
   useEffect(() => {
-    // Clear previous timer
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
 
-    // Don't search if query is too short or dropdown is closed
     if (!isOpen || searchQuery.trim().length < 2) {
       setProducts([]);
       setError(null);
@@ -52,7 +49,6 @@ export default function SearchDropdown({
     setIsLoading(true);
     setError(null);
 
-    // Debounce the search
     debounceTimerRef.current = setTimeout(async () => {
       try {
         const response = await fetch(
@@ -74,7 +70,6 @@ export default function SearchDropdown({
       }
     }, 300);
 
-    // Cleanup
     return () => {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
@@ -82,12 +77,10 @@ export default function SearchDropdown({
     };
   }, [searchQuery, isOpen]);
 
-  // Reset selected index when products change
   useEffect(() => {
     setSelectedIndex(-1);
   }, [products]);
 
-  // Handle keyboard navigation
   useEffect(() => {
     if (!isOpen) return;
 
@@ -117,14 +110,12 @@ export default function SearchDropdown({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, products, selectedIndex, onClose, onSelectProduct]);
 
-  // Handle click outside
   useEffect(() => {
     if (!isOpen) return;
 
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       
-      // Don't close if clicking on the search input or within the dropdown
       if (
         target.closest('input[type="text"][placeholder="Search products..."]') ||
         target.closest('[data-search-dropdown]') ||
@@ -133,11 +124,9 @@ export default function SearchDropdown({
         return;
       }
       
-      // Close dropdown when clicking outside
       onClose();
     };
 
-    // Use a small delay to avoid closing immediately when clicking
     const timeoutId = setTimeout(() => {
       document.addEventListener("mousedown", handleClickOutside);
     }, 100);

@@ -116,7 +116,7 @@ export default function CartPage() {
                 </div>
               </div>
               <Link
-                href="/checkout"
+                href="/checkout/auth"
                 className="block w-full bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-semibold text-center"
               >
                 Proceed to Checkout

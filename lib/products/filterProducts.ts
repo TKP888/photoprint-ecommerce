@@ -14,7 +14,6 @@ export function buildProductQuery(
 ) {
   let query = supabase.from("products").select("*");
 
-  // Search filter - search in name and description
   if (filters.search) {
     const searchTerm = filters.search.trim();
     query = query.or(
@@ -22,7 +21,6 @@ export function buildProductQuery(
     );
   }
 
-  // Price range filters
   if (filters.minPrice) {
     const minPrice = parseFloat(filters.minPrice);
     if (!isNaN(minPrice)) {
@@ -37,14 +35,9 @@ export function buildProductQuery(
     }
   }
 
-  // Stock filter - handled client-side after fetch due to OR condition across columns
-  // This will be applied in the product page after fetching
-
-  // Sort
   const sortOption = filters.sort || "name_asc";
   const [column, direction] = sortOption.split("_");
 
-  // Map sort options to database columns
   let sortColumn = column;
   if (column === "newest") {
     sortColumn = "created_at";

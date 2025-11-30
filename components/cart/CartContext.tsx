@@ -56,7 +56,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (savedCart) {
       try {
         const parsedItems = JSON.parse(savedCart);
-        // Migrate old cart items that don't have stock field
         const migratedItems = parsedItems.map((item: CartItem) => ({
           ...item,
           stock: item.stock ?? null,
@@ -84,7 +83,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const currentQuantity = existingItem ? existingItem.quantity : 0;
       const newQuantity = currentQuantity + 1;
 
-      // Validate stock limit
       if (stock !== null && newQuantity > stock) {
         shouldShowError = true;
         return prevItems; // Don't update cart
@@ -99,7 +97,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    // Show toast notification
     if (shouldShowError) {
       setToast({
         show: true,
@@ -137,9 +134,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const item = prevItems.find((i) => i.id === id);
       if (!item) return prevItems;
 
-      // Validate stock limit
       if (item.stock !== null && quantity > item.stock) {
-        // Cap at stock limit and show error toast
         const cappedQuantity = item.stock;
         setToast({
           show: true,

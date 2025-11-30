@@ -72,7 +72,6 @@ export default function PaymentMethodsPage() {
     setError(null);
     const supabase = createClient();
 
-    // If setting as default, unset other defaults first
     if (formData.is_default) {
       await supabase
         .from("payment_methods")
@@ -120,14 +119,12 @@ export default function PaymentMethodsPage() {
 
     const supabase = createClient();
 
-    // Unset all other defaults
     await supabase
       .from("payment_methods")
       .update({ is_default: false })
       .eq("user_id", user.id)
       .eq("is_default", true);
 
-    // Set this one as default
     const { error } = await supabase
       .from("payment_methods")
       .update({ is_default: true })
@@ -199,7 +196,6 @@ export default function PaymentMethodsPage() {
         </div>
       )}
 
-      {/* Add Form */}
       {isFormOpen && (
         <div className="bg-gray-900 rounded-lg border border-gray-700 p-6">
           <h2 className="text-xl font-semibold text-white mb-4">
@@ -333,7 +329,6 @@ export default function PaymentMethodsPage() {
         </div>
       )}
 
-      {/* Payment Methods List */}
       {paymentMethods.length === 0 ? (
         <div className="text-center py-12 bg-gray-900 rounded-lg border border-gray-700">
           <p className="text-gray-400 text-lg mb-4">

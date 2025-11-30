@@ -42,15 +42,12 @@ export default function OrderDetailPage() {
     if (!user || !orderNumber) return;
 
     const fetchOrder = async () => {
-      // First, update order statuses if needed
       try {
         await fetch("/api/orders/update-status", { method: "POST" });
       } catch (error) {
         console.error("Error updating order statuses:", error);
-        // Continue anyway - status update is not critical
       }
 
-      // Then fetch the order
       const supabase = createClient();
       const { data, error } = await supabase
         .from("orders")
@@ -185,7 +182,6 @@ export default function OrderDetailPage() {
               {order.shipping_info.city}, {order.shipping_info.postcode}
             </p>
             <p>{order.shipping_info.country}</p>
-            {/* <p className="mt-4 text-gray-400">{order.shipping_info.email}</p> */}
           </div>
         </div>
       </div>

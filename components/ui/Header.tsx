@@ -43,7 +43,6 @@ export default function Header() {
 
   const handleSearchIconClick = () => {
     setIsSearchOpen(true);
-    // Focus the input after it appears
     setTimeout(() => {
       const input = document.querySelector(
         'input[type="text"][placeholder="Search products..."]'
@@ -63,14 +62,12 @@ export default function Header() {
     <header className="sticky top-0 z-50 bg-gray-300 text-black shadow-sm">
       <div className="container mx-auto px-4 md:px-8 py-4 md:py-8">
         <div className="flex items-center justify-between relative">
-          {/* Left Section - Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="hover:text-gray-500">
               <h1 className="text-2xl font-bold">PhotoPrint</h1>
             </Link>
           </div>
 
-          {/* Middle Section - Navigation Links (Centered) */}
           <nav className="hidden md:block absolute left-1/2 transform -translate-x-1/2">
             <ul className="flex gap-8 text-lg font-bold items-center">
               {navLinks.map((link) => (
@@ -86,9 +83,7 @@ export default function Header() {
             </ul>
           </nav>
 
-          {/* Right Section - Search, Account & Cart Icons */}
           <div className="hidden md:flex items-center gap-4 flex-shrink-0">
-            {/* Search - Icon or Expanded Bar */}
             {isSearchOpen ? (
               <div className="relative">
                 <form onSubmit={handleSearch} className="relative">
@@ -97,11 +92,8 @@ export default function Header() {
                     placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    onFocus={() => {
-                      // Keep search open when focused
-                    }}
+                    onFocus={() => {}}
                     onBlur={(e) => {
-                      // Don't close if clicking the submit button or dropdown
                       const relatedTarget = e.relatedTarget as HTMLElement;
                       if (
                         relatedTarget &&
@@ -110,7 +102,6 @@ export default function Header() {
                       ) {
                         return;
                       }
-                      // Only close if input is empty
                       if (!searchQuery.trim()) {
                         setIsSearchOpen(false);
                       }
@@ -167,9 +158,7 @@ export default function Header() {
                   <SearchDropdown
                     searchQuery={searchQuery}
                     isOpen={isSearchOpen && searchQuery.trim().length >= 2}
-                    onClose={() => {
-                      // Only close dropdown, not the search input
-                    }}
+                    onClose={() => {}}
                     onSelectProduct={() => {
                       setSearchQuery("");
                       setIsSearchOpen(false);
@@ -201,7 +190,6 @@ export default function Header() {
               </button>
             )}
 
-            {/* Cart Icon with Dropdown */}
             <div
               className="relative"
               onMouseEnter={() => setIsCartHover(true)}
@@ -232,14 +220,12 @@ export default function Header() {
                 )}
               </Link>
 
-              {/* Cart Dropdown */}
               {isCartHover && (
                 <div
                   className="absolute right-0 w-80 z-50"
                   onMouseEnter={() => setIsCartHover(true)}
                   onMouseLeave={() => setIsCartHover(false)}
                 >
-                  {/* Invisible bridge to make hover easier */}
                   <div className="h-2"></div>
                   <div className="mt-2 bg-white rounded-lg shadow-xl border border-gray-200">
                     {items.length === 0 ? (
@@ -404,7 +390,6 @@ export default function Header() {
               )}
             </div>
 
-            {/* Account Icon with Dropdown */}
             {user ? (
               <div
                 className="relative"
@@ -431,14 +416,12 @@ export default function Header() {
                   </svg>
                 </button>
 
-                {/* Account Dropdown */}
                 {isAccountHover && (
                   <div
                     className="absolute right-0 w-56 z-50"
                     onMouseEnter={() => setIsAccountHover(true)}
                     onMouseLeave={() => setIsAccountHover(false)}
                   >
-                    {/* Invisible bridge to make hover easier */}
                     <div className="h-2"></div>
                     <div className="mt-2 bg-white rounded-lg shadow-xl border border-gray-200">
                       <div className="py-2">
@@ -599,7 +582,6 @@ export default function Header() {
             )}
           </div>
 
-          {/* Mobile hamburger */}
           <button
             type="button"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -640,14 +622,12 @@ export default function Header() {
           </button>
         </div>
 
-        {/* Mobile nav */}
         <nav
           className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out bg-white border-t border-gray-200 ${
             isMenuOpen ? "max-h-[90vh] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
           <div className="px-4 py-4 space-y-2">
-            {/* Search Bar - Mobile */}
             <div className="mb-4 relative">
               <form
                 onSubmit={(e) => {
@@ -667,9 +647,7 @@ export default function Header() {
                     placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    onFocus={() => {
-                      // Keep search open when focused
-                    }}
+                    onFocus={() => {}}
                     className="w-full px-4 py-2 pl-10 pr-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 bg-white"
                   />
                   <button
@@ -699,9 +677,7 @@ export default function Header() {
                   <SearchDropdown
                     searchQuery={searchQuery}
                     isOpen={isMenuOpen && searchQuery.trim().length >= 2}
-                    onClose={() => {
-                      // Only close dropdown, not the search input
-                    }}
+                    onClose={() => {}}
                     onSelectProduct={() => {
                       setSearchQuery("");
                       setIsMenuOpen(false);
@@ -711,7 +687,6 @@ export default function Header() {
               )}
             </div>
 
-            {/* Navigation Links */}
             <div className="space-y-1">
               {navLinks.map((link) => (
                 <Link
@@ -725,7 +700,6 @@ export default function Header() {
               ))}
             </div>
 
-            {/* Account Section */}
             {user ? (
               <div className="border-t border-gray-200 pt-2">
                 <button
@@ -770,7 +744,6 @@ export default function Header() {
                   </svg>
                 </button>
 
-                {/* Account Dropdown */}
                 {isMobileAccountOpen && (
                   <div className="mt-2 bg-gray-50 rounded-lg overflow-hidden">
                     <Link
@@ -935,7 +908,6 @@ export default function Header() {
                 </Link>
               </div>
             )}
-            {/* Cart Section */}
             <div className="border-t border-gray-200 pt-2">
               <button
                 type="button"
@@ -984,7 +956,6 @@ export default function Header() {
                 </svg>
               </button>
 
-              {/* Cart Items Dropdown */}
               {isMobileCartOpen && (
                 <div className="mt-2 bg-gray-50 rounded-lg overflow-hidden">
                   {items.length === 0 ? (

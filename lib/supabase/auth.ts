@@ -1,4 +1,3 @@
-// lib/supabase/auth.ts
 import { createClient } from "@/lib/supabase/client";
 import type {
   AuthResponse,

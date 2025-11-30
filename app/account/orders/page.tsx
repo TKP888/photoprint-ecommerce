@@ -22,15 +22,12 @@ export default function OrdersPage() {
     if (!user) return;
 
     const fetchOrders = async () => {
-      // First, update order statuses if needed
       try {
         await fetch("/api/orders/update-status", { method: "POST" });
       } catch (error) {
         console.error("Error updating order statuses:", error);
-        // Continue anyway - status update is not critical
       }
 
-      // Then fetch orders
       const supabase = createClient();
       const { data, error } = await supabase
         .from("orders")

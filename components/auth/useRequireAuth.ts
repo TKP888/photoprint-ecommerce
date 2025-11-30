@@ -1,4 +1,3 @@
-// components/auth/useRequireAuth.ts
 "use client";
 
 import { useEffect } from "react";

@@ -6,10 +6,8 @@ import { createClient } from "@/lib/supabase/client";
 export default async function Home() {
   const supabase = createClient();
 
-  // Fetch all products to find limited edition items
   const { data: allProducts } = await supabase.from("products").select("*");
 
-  // Fetch limited products for display sections
   const { data: products, error } = await supabase
     .from("products")
     .select("*")
@@ -19,7 +17,6 @@ export default async function Home() {
     console.error("Error fetching products:", error);
   }
 
-  // Find the limited edition products by name (search in all products)
   const steelMotion = allProducts?.find(
     (product) => product.name === "Steel Motion"
   );

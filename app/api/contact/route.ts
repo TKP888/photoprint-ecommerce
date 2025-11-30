@@ -6,7 +6,6 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { name, email, message } = body;
 
-    // Validate required fields
     if (!name || !email || !message) {
       return NextResponse.json(
         { error: "Name, email, and message are required" },
@@ -14,7 +13,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
@@ -23,7 +21,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate message length
     if (message.trim().length < 10) {
       return NextResponse.json(
         { error: "Message must be at least 10 characters long" },
@@ -31,13 +28,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Optional: Get user if authenticated
     const supabase = createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    // Save to database (you'll need to create a 'contact_submissions' table in Supabase)
     const { error: dbError } = await supabase
       .from("contact_submissions")
       .insert({
@@ -60,18 +55,6 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
-
-    // TODO: Send email notification (optional)
-    // You can integrate with email services like:
-    // - Resend (resend.com)
-    // - SendGrid
-    // - Nodemailer
-    // Example:
-    // await sendEmail({
-    //   to: "your-email@example.com",
-    //   subject: `New Contact Form Submission from ${name}`,
-    //   body: `Email: ${email}\n\nMessage: ${message}`,
-    // });
 
     return NextResponse.json({
       success: true,

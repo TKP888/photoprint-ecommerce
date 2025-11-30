@@ -6,7 +6,6 @@ export async function POST(request: Request) {
     const adminSupabase = createAdminClient();
     const now = new Date();
 
-    // Fetch all orders that need status updates
     const { data: orders, error: fetchError } = await adminSupabase
       .from("orders")
       .select("id, created_at, status")
@@ -32,11 +31,10 @@ export async function POST(request: Request) {
 
       let newStatus: string | null = null;
 
-      if (order.status === "pending" && hoursSinceOrder >= 24) {
-        newStatus = "shipped";
-      } else if (order.status === "shipped" && hoursSinceOrder >= 72) {
-        // 24 hours (pending->shipped) + 48 hours (shipped->delivered) = 72 hours total
-        newStatus = "delivered";
+    if (order.status === "pending" && hoursSinceOrder >= 24) {
+      newStatus = "shipped";
+    } else if (order.status === "shipped" && hoursSinceOrder >= 72) {
+      newStatus = "delivered";
       }
 
       if (newStatus) {
@@ -70,7 +68,6 @@ export async function POST(request: Request) {
   }
 }
 
-// Also allow GET for easy testing
 export async function GET() {
   return POST(new Request("", { method: "POST" }));
 }

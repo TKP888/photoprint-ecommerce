@@ -11,7 +11,6 @@ export default function TrackProductView({ productId }: TrackProductViewProps) {
   const { user } = useAuth();
 
   useEffect(() => {
-    // Only track if user is authenticated
     if (!user || !productId) {
       console.log(
         "TrackProductView: Skipping - user:",
@@ -24,7 +23,6 @@ export default function TrackProductView({ productId }: TrackProductViewProps) {
 
     console.log("TrackProductView: Tracking view for product:", productId);
 
-    // Track the view
     fetch("/api/recently-viewed", {
       method: "POST",
       headers: {

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function ServicesPage() {
   return (
     <main>
@@ -24,50 +26,11 @@ export default function ServicesPage() {
             <h2 className="text-3xl text-white font-bold mb-6 text-center">
               High-Quality Photo Prints
             </h2>
-            <p className="text-lg text-white mb-6">
-              Bring your memories to life with stunning photo prints that
-              capture every detail and color. We use premium photo paper and
-              professional-grade inks to ensure your pictures stay vibrant for
-              years to come.
-            </p>
-            <p className="text-lg text-white mb-6">
-              Choose from a variety of sizes, finishes (matte, glossy, or
-              lustre), and borders to perfectly match your vision.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 bg-gray-700">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl text-white font-bold mb-6 text-center">
-              Canvas & Wall Art Printing
-            </h2>
-            <p className="text-lg text-white mb-6">
-              Transform your favorite shots into timeless wall art. Our canvas
-              prints are stretched on durable wooden frames and printed with
-              fade-resistant ink for gallery-quality results.
-            </p>
-            <p className="text-lg text-white">
-              Whether it’s a family portrait, travel memory, or artistic shot,
-              we make it easy to decorate your space with meaningful images.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 bg-gray-800">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl text-white font-bold mb-6 text-center">
-              Photo Books & Albums
-            </h2>
             <p className="text-lg text-white text-center">
-              Tell your story beautifully with custom-designed photo books and
-              albums. Ideal for weddings, vacations, or milestone events, our
-              photo books feature high-resolution printing, sturdy binding, and
-              elegant cover options.
+              Bring your memories to life with stunning photo prints using
+              premium photo paper and professional-grade inks. Choose from a
+              variety of sizes, finishes (matte, glossy, or lustre), and borders
+              to perfectly match your vision.
             </p>
           </div>
         </div>
@@ -75,17 +38,20 @@ export default function ServicesPage() {
 
       <section className="py-16 bg-gray-700">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl text-white font-bold mb-6 text-center">
-              Personalised Gifts & Accessories
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl text-white font-bold mb-6">
+              Bespoke Requests
             </h2>
             <p className="text-lg text-white mb-6">
-              Turn your photos into unique, heartfelt gifts. From mugs and
-              calendars to phone cases and puzzles, we offer a wide range of
-              customisable products that make every occasion memorable. Upload
-              your favourite pictures and let us craft something that’s both
-              personal and high-quality.
+              Have a specific request or need something custom? We&apos;re here
+              to help with bespoke printing solutions tailored to your needs.
             </p>
+            <Link
+              href="/contact"
+              className="inline-block bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-colors font-semibold text-lg"
+            >
+              Contact Us
+            </Link>
           </div>
         </div>
       </section>

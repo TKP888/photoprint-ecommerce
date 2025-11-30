@@ -1,16 +1,25 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/auth/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signIn } = useAuth();
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const redirect = searchParams.get("redirect");
+    if (redirect) {
+      setRedirectUrl(redirect);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -29,7 +38,8 @@ export default function LoginPage() {
       return;
     }
 
-    router.replace("/account");
+    const destination = redirectUrl || "/account";
+    router.replace(destination);
   };
 
   return (
@@ -79,7 +89,14 @@ export default function LoginPage() {
           </p>
           <p>
             Don&apos;t have an account?{" "}
-            <Link href="/auth/signup" className="text-blue-500 hover:underline">
+            <Link
+              href={
+                redirectUrl
+                  ? `/auth/signup?redirect=${encodeURIComponent(redirectUrl)}`
+                  : "/auth/signup"
+              }
+              className="text-blue-500 hover:underline"
+            >
               Sign up
             </Link>
           </p>

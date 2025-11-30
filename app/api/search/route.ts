@@ -16,13 +16,11 @@ export async function GET(request: Request) {
 
     const supabase = createClient();
 
-    // Build query with search filter
     const productQuery = buildProductQuery(supabase, {
       search: query.trim(),
       sort: "name_asc",
     });
 
-    // Limit to 8 results for performance
     const { data: products, error } = await productQuery.limit(8);
 
     if (error) {
