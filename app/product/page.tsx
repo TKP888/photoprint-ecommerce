@@ -3,6 +3,7 @@ import ProductFilters from "@/components/product/ProductFilters";
 import { createClient } from "@/lib/supabase/client";
 import { buildProductQuery } from "@/lib/products/filterProducts";
 import Link from "next/link";
+import type { Product } from "@/types";
 
 interface ProductPageProps {
   searchParams: Promise<{
@@ -43,7 +44,7 @@ export default async function ProductPage({ searchParams }: ProductPageProps) {
 
   let filteredProducts = products || [];
   if (params.inStock === "true" && filteredProducts.length > 0) {
-    filteredProducts = filteredProducts.filter((product: any) => {
+    filteredProducts = filteredProducts.filter((product: Product) => {
       const stock = product.stock;
       const stockQuantity = product.stock_quantity;
       return (
@@ -91,8 +92,8 @@ export default async function ProductPage({ searchParams }: ProductPageProps) {
                 price={product.price}
                 imageUrl={product.image_url}
                 description={product.description}
-                stock={(product as any).stock}
-                stockQuantity={(product as any).stock_quantity}
+                stock={(product as Product).stock}
+                stockQuantity={(product as Product).stock_quantity}
               />
             ))}
           </div>

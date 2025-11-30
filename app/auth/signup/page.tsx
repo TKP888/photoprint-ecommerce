@@ -1,11 +1,11 @@
 "use client";
 
-import { FormEvent, useState, useEffect } from "react";
+import { FormEvent, useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthContext";
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { signUp } = useAuth();
@@ -130,5 +130,17 @@ export default function SignupPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gray-800 flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </main>
+    }>
+      <SignupForm />
+    </Suspense>
   );
 }

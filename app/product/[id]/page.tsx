@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import AddToCartButton from "@/components/product/AddToCartButton";
 import ProductCard from "@/components/ui/ProductCard";
 import TrackProductView from "@/components/product/TrackProductView";
+import type { Product } from "@/types";
 
 interface ProductDetailPageProps {
   params: Promise<{ id: string }>;
@@ -71,8 +72,8 @@ export default async function ProductDetailPage({
               name={product.name}
               price={product.price}
               imageUrl={product.image_url}
-              stock={(product as any).stock}
-              stockQuantity={(product as any).stock_quantity}
+              stock={(product as Product).stock}
+              stockQuantity={(product as Product).stock_quantity}
             />
           </div>
         </div>
@@ -89,8 +90,8 @@ export default async function ProductDetailPage({
                   price={otherProduct.price}
                   imageUrl={otherProduct.image_url}
                   description={otherProduct.description}
-                  stock={(otherProduct as any).stock}
-                  stockQuantity={(otherProduct as any).stock_quantity}
+                  stock={(otherProduct as Product).stock}
+                  stockQuantity={(otherProduct as Product).stock_quantity}
                 />
               ))}
             </div>

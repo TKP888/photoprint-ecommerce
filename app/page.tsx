@@ -2,6 +2,7 @@ import ProductCard from "@/components/ui/ProductCard";
 import Carousel from "@/components/home/Carousel";
 import LimitedEditionSection from "@/components/home/LimitedEditionSection";
 import { createClient } from "@/lib/supabase/client";
+import type { Product } from "@/types";
 
 export default async function Home() {
   const supabase = createClient();
@@ -41,8 +42,8 @@ export default async function Home() {
               price={product.price}
               imageUrl={product.image_url}
               description={product.description}
-              stock={(product as any).stock}
-              stockQuantity={(product as any).stock_quantity}
+              stock={(product as Product).stock}
+              stockQuantity={(product as Product).stock_quantity}
             />
           ))}
         </div>
@@ -81,8 +82,8 @@ export default async function Home() {
               price={product.price}
               imageUrl={product.image_url}
               description={product.description}
-              stock={(product as any).stock}
-              stockQuantity={(product as any).stock_quantity}
+              stock={(product as Product).stock}
+              stockQuantity={(product as Product).stock_quantity}
             />
           ))}
         </div>

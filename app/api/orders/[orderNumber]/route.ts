@@ -3,14 +3,15 @@ import { createAdminClient } from "@/lib/supabase/admin"; // same service-role c
 
 export async function GET(
   request: Request,
-  { params }: { params: { orderNumber: string } }
+  { params }: { params: Promise<{ orderNumber: string }> }
 ) {
   try {
+    const { orderNumber } = await params;
     const supabase = createAdminClient(); // service role to bypass RLS
     const { data, error } = await supabase
       .from("orders")
       .select("*")
-      .eq("order_number", params.orderNumber)
+      .eq("order_number", orderNumber)
       .single();
 
     if (error || !data) {

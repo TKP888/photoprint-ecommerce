@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import Link from "next/link";
 import { useCart } from "@/components/cart/CartContext";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -29,7 +29,7 @@ interface OrderData {
   total: number;
 }
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessContent() {
   const router = useRouter();
   const { clearCart } = useCart();
   const [orderData, setOrderData] = useState<OrderData | null>(null);
@@ -242,5 +242,26 @@ export default function CheckoutSuccessPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <main className="py-8 bg-gray-800 min-h-screen">
+      <div className="container mx-auto px-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
+          <p className="text-white mt-4">Fetching your order...</p>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <CheckoutSuccessContent />
+    </Suspense>
   );
 }

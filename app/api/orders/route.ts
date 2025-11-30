@@ -1,12 +1,13 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import type { OrderItem, StockUpdate } from "@/types";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const serverSupabase = createClient();
+    const serverSupabase = await createClient();
     const {
       data: { user },
     } = await serverSupabase.auth.getUser();
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
     const { items, shippingInfo, billingInfo, subtotal, shippingCost, total } =
       body;
 
-    const stockUpdates: Array<{ id: string; newStock: number; fieldName: string }> = [];
+    const stockUpdates: StockUpdate[] = [];
     
     for (const item of items) {
       const { data: product, error: productError } = await adminSupabase
@@ -64,7 +65,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const orderItems = items.map((item: any) => ({
+    const orderItems = items.map((item: OrderItem) => ({
       product_id: item.id,
       name: item.name,
       price: item.price,
@@ -94,7 +95,7 @@ export async function POST(request: Request) {
     }
 
     for (const update of stockUpdates) {
-      const updateData: any = {};
+      const updateData: Record<string, number> = {};
       updateData[update.fieldName] = update.newStock;
 
       const { error: stockError } = await adminSupabase
@@ -115,12 +116,18 @@ export async function POST(request: Request) {
       orderNumber,
       orderId: data.id,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating order:", error);
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : typeof error === "object" && error !== null && "details" in error
+        ? String(error.details)
+        : "Unknown error";
     return NextResponse.json(
       {
         error: "Failed to create order",
-        message: error?.message || error?.details || "Unknown error",
+        message: errorMessage,
       },
       { status: 500 }
     );

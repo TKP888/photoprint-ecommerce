@@ -1,11 +1,11 @@
 "use client";
 
-import { FormEvent, useState, useEffect } from "react";
+import { FormEvent, useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { signIn } = useAuth();
@@ -103,5 +103,17 @@ export default function LoginPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gray-800 flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </main>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

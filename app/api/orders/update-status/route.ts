@@ -1,7 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
     const adminSupabase = createAdminClient();
     const now = new Date();
@@ -56,12 +56,13 @@ export async function POST(request: Request) {
       updated: updatedCount,
       message: `Updated ${updatedCount} order(s)`,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating order statuses:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
       {
         error: "Failed to update order statuses",
-        message: error?.message || "Unknown error",
+        message: errorMessage,
       },
       { status: 500 }
     );
@@ -69,6 +70,6 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-  return POST(new Request("", { method: "POST" }));
+  return POST();
 }
 

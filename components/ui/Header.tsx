@@ -94,10 +94,13 @@ export default function Header() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => {}}
                     onBlur={(e) => {
-                      const relatedTarget = e.relatedTarget as HTMLElement;
+                      const relatedTarget = e.relatedTarget as HTMLElement | null;
                       if (
                         relatedTarget &&
-                        (relatedTarget.type === "submit" ||
+                        ((relatedTarget instanceof HTMLInputElement &&
+                          relatedTarget.type === "submit") ||
+                          (relatedTarget instanceof HTMLButtonElement &&
+                            relatedTarget.type === "submit") ||
                           relatedTarget.closest('[data-search-dropdown]'))
                       ) {
                         return;

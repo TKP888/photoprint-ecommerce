@@ -2,8 +2,12 @@ import { createClient } from "@/lib/supabase/client";
 import type {
   AuthResponse,
   AuthTokenResponsePassword,
-  ResetPasswordForEmailParams,
 } from "@supabase/supabase-js";
+
+interface ResetPasswordForEmailParams {
+  email: string;
+  redirectTo?: string;
+}
 
 /**
  * Sign up a user with email + password.
