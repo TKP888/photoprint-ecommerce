@@ -97,11 +97,11 @@ export default function Carousel() {
               <div className="absolute inset-0 bg-black opacity-20"></div>
             </div>
 
-            <div className="relative z-10 bg-black py-4 px-4 text-white">
-              <h1 className="text-4xl md:text-6xl font-bold mb-4">
+            <div className="relative z-10 bg-black py-4 px-4 sm:px-6 md:px-8 text-white max-w-[95%] sm:max-w-[90%] md:max-w-4xl mx-auto text-center">
+              <h1 className="text-2xl sm:text-3xl md:text-6xl font-bold mb-4 break-words px-2">
                 {slide.title}
               </h1>
-              <p className="text-xl md:text-2xl">{slide.subtitle}</p>
+              <p className="text-base sm:text-lg md:text-2xl break-words px-2">{slide.subtitle}</p>
             </div>
           </div>
         ))}

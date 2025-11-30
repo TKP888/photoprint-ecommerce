@@ -31,7 +31,7 @@ export default async function Home() {
         <Carousel />
       </div>
       <div className="container mx-auto py-12 px-4">
-        <h1 className="text-2xl font-bold mb-8">Best Sellers</h1>
+        <h1 className="text-2xl font-bold mb-8 text-white">Best Sellers</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {products?.slice(0, 4).map((product) => (
@@ -71,7 +71,7 @@ export default async function Home() {
       />
 
       <div className="container mx-auto py-12 px-4">
-        <h1 className="text-2xl font-bold mb-8">Featured Products</h1>
+        <h1 className="text-2xl font-bold mb-8 text-white">Featured Products</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {products?.slice(4, 12).map((product) => (

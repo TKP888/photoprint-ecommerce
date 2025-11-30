@@ -627,7 +627,7 @@ export default function Header() {
 
         <nav
           className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out bg-white border-t border-gray-200 ${
-            isMenuOpen ? "max-h-[90vh] opacity-100" : "max-h-0 opacity-0"
+            isMenuOpen ? "max-h-[90vh] opacity-100 overflow-y-auto" : "max-h-0 opacity-0"
           }`}
         >
           <div className="px-4 py-4 space-y-2">
@@ -960,7 +960,7 @@ export default function Header() {
               </button>
 
               {isMobileCartOpen && (
-                <div className="mt-2 bg-gray-50 rounded-lg overflow-hidden">
+                <div className="mt-2 bg-gray-50 rounded-lg overflow-hidden max-h-[50vh] flex flex-col">
                   {items.length === 0 ? (
                     <div className="p-4 text-center text-gray-500">
                       <p className="text-sm mb-2">Your cart is empty</p>
@@ -974,7 +974,7 @@ export default function Header() {
                     </div>
                   ) : (
                     <>
-                      <div className="max-h-64 overflow-y-auto">
+                      <div className="flex-1 overflow-y-auto min-h-0">
                         {items.map((item) => (
                           <div
                             key={item.id}
@@ -1110,7 +1110,7 @@ export default function Header() {
                           </div>
                         ))}
                       </div>
-                      <div className="p-3 bg-white border-t border-gray-200">
+                      <div className="flex-shrink-0 p-3 bg-white border-t border-gray-200">
                         <div className="flex justify-between items-center mb-2">
                           <span className="font-semibold text-gray-800">
                             Total:

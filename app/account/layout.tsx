@@ -30,7 +30,7 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
       <div className="container mx-auto px-4 py-10">
         <div className="flex flex-col lg:flex-row gap-8">
           <aside className="lg:w-64 bg-gray-800 rounded-xl p-6 shadow-lg">
-            <h2 className="text-xl font-semibold mb-6">Account</h2>
+            <h2 className="text-xl font-semibold mb-6 text-white">Account</h2>
             <nav>
               <ul className="space-y-3">
                 {navItems.map((item) => {

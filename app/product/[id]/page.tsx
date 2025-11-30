@@ -58,7 +58,7 @@ export default async function ProductDetailPage({
           </div>
 
           <div>
-            <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
+            <h1 className="text-3xl font-bold mb-4 text-white">{product.name}</h1>
             <p className="text-xl font-semibold mb-4 text-blue-600">
               £{product.price}
             </p>
@@ -80,7 +80,7 @@ export default async function ProductDetailPage({
 
         {randomizedProducts && randomizedProducts.length > 0 && (
           <div className="mt-16">
-            <h2 className="text-2xl font-bold mb-8">More Products</h2>
+            <h2 className="text-2xl font-bold mb-8 text-white">More Products</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {randomizedProducts.map((otherProduct) => (
                 <ProductCard

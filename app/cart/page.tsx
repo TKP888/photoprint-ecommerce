@@ -30,7 +30,7 @@ export default function CartPage() {
     <main className="py-8 bg-gray-800">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold">Your Cart</h1>
+          <h1 className="text-2xl font-bold text-white">Your Cart</h1>
           <button
             onClick={clearCart}
             className="text-red-500 hover:text-red-600 text-sm underline"
