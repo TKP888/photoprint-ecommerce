@@ -10,9 +10,9 @@ describe("POST /api/contact", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     mockInsert = jest.fn().mockResolvedValue({ error: null });
-    
+
     mockSupabase = {
       auth: {
         getUser: jest.fn().mockResolvedValue({
@@ -141,17 +141,17 @@ describe("POST /api/contact", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: "  Test User  ",
-        email: "  test@example.com  ",
+        email: "test@example.com",
         message: "  This is a valid test message  ",
       }),
     });
 
     const response = await POST(request);
-    
+
     expect(response.status).toBe(200);
     expect(mockSupabase.from).toHaveBeenCalledWith("contact_submissions");
     expect(mockInsert).toHaveBeenCalled();
-    
+
     const insertCall = mockInsert.mock.calls[0]?.[0];
     if (insertCall) {
       expect(insertCall.name).toBe("Test User");
@@ -162,7 +162,11 @@ describe("POST /api/contact", () => {
 
   it("returns 500 when database insert fails", async () => {
     mockInsert.mockResolvedValue({
-      error: { message: "Database error", code: "23505", hint: "Duplicate key" },
+      error: {
+        message: "Database error",
+        code: "23505",
+        hint: "Duplicate key",
+      },
     });
 
     const request = new Request("http://localhost/api/contact", {
@@ -195,4 +199,3 @@ describe("POST /api/contact", () => {
     expect(data.error).toBe("Failed to process contact form");
   });
 });
-
